@@ -1,0 +1,8 @@
+{
+  "name": "sample-shop",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev": "docker compose -f infra/compose.yaml up"
+  }
+}

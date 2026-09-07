@@ -1,0 +1,4 @@
+node_modules/
+*.tsbuildinfo
+plugins/architecture-map/skills/architecture-map/runtime/fixtures/rendered/
+.DS_Store

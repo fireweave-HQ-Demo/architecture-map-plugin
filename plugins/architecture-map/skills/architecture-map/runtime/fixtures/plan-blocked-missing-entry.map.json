@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "title": "Plan blocked — who starts the flow?",
+  "intent": "Cannot grade the plan: it does not say what starts the flow or which code unit owns it. Ask; do not guess.",
+  "query": { "mode": "plan", "name": "unspecified" },
+  "generatedAt": "2026-09-07T10:00:00Z",
+  "verdict": "blocked",
+  "questions": [
+    {
+      "id": "entry-actor",
+      "ask": "What starts this flow — a page in the web app, an API client, a message on the bus, a scheduled job, or something else?",
+      "because": "The plan has no entry actor, so there is no first hop to check against disk."
+    },
+    {
+      "id": "owning-unit",
+      "ask": "Which existing feature folder under apps/api/src/features/ owns this, or what is the new feature's name?",
+      "because": "Without the owner the inventory cannot tell existing work from new work."
+    },
+    {
+      "id": "after-response",
+      "ask": "After the request returns, is any remaining work done by the outbox relay, by a consumer on the bus, or nowhere?",
+      "because": "The plan says \"in the background\" without naming a mechanism that exists in this repo."
+    }
+  ],
+  "findings": [],
+  "infra": [
+    { "id": "postgres", "used": false },
+    { "id": "redis", "used": false },
+    { "id": "rabbitmq", "used": false },
+    { "id": "adminer", "used": false }
+  ],
+  "processes": [
+    { "id": "api", "used": false },
+    { "id": "web", "used": false }
+  ],
+  "columns": [],
+  "hops": [],
+  "grounding": [{ "id": "compose", "path": "infra/compose.yaml" }],
+  "unknown": []
+}

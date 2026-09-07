@@ -1,0 +1,48 @@
+# Local stack for sample-shop. Host ports are for the developer's browser;
+# services talk to each other by service name.
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: shop-postgres
+    environment:
+      POSTGRES_USER: shop
+      POSTGRES_PASSWORD: shop
+    ports:
+      - "15432:5432"
+
+  redis:
+    image: redis:7-alpine
+    container_name: shop-redis
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: shop-rabbitmq
+    ports:
+      - "15672:15672"
+
+  api:
+    build:
+      context: ../apps/api
+      dockerfile: Dockerfile
+    container_name: shop-api
+    working_dir: /app
+    environment:
+      DATABASE_URL: postgres://shop:shop@postgres:5432/shop
+      AMQP_URL: amqp://rabbitmq:5672
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  web:
+    build: ../apps/web
+    container_name: shop-web
+    environment:
+      API_URL: http://api:3000
+    depends_on:
+      - api
+
+  adminer:
+    image: adminer:4
+    container_name: shop-adminer
+    ports:
+      - "18080:8080"

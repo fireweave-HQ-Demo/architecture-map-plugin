@@ -1,0 +1,2480 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Architecture map</title>
+    <style>
+      :root {
+        --page: #f4f6fb;
+        --card: #ffffff;
+        --ink: #0f172a;
+        --ash: #94a3b8;
+        --smoke: #64748b;
+        --faint: #94a3b8;
+        --accent: #4f46e5;
+        --on-accent: #ffffff;
+        --ok: #059669;
+        --ok-bg: #ecfdf5;
+        --info: #2563eb;
+        --info-bg: #eff6ff;
+        --changed: #7c3aed;
+        --changed-bg: #f5f3ff;
+        --conflict: #dc2626;
+        --danger-bg: #fef2f2;
+        --line: #e2e8f0;
+        --unused: 0.45;
+        --halo: #eef2ff;
+        --font: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+        --shadow: 0 10px 28px rgba(15, 23, 42, 0.07);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        background: var(--page);
+        color: var(--ink);
+        font-family: var(--font);
+      }
+      body {
+        padding: 32px 36px 64px;
+      }
+      body::before {
+        content: '';
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        z-index: 30;
+        background: var(--accent);
+      }
+      header {
+        margin-bottom: 18px;
+      }
+      header p.kicker {
+        margin: 0 0 6px;
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--smoke);
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+        font-weight: 650;
+        letter-spacing: -0.02em;
+      }
+      .intent {
+        margin: 0;
+        max-width: 72ch;
+        color: var(--ink);
+        line-height: 1.45;
+      }
+      .verdict {
+        display: none;
+        margin: 10px 0 0;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .verdict.on {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        border: 1.5px solid var(--line);
+      }
+      .verdict.fail {
+        border-color: var(--conflict);
+        color: var(--conflict);
+        background: var(--danger-bg);
+      }
+      .verdict.blocked {
+        background: var(--ink);
+        color: var(--page);
+        border-color: var(--ink);
+      }
+      .verdict.pass,
+      .verdict.pass-with-new-work {
+        border-color: var(--ok);
+        color: var(--ok);
+        background: var(--ok-bg);
+      }
+      .toolbar {
+        display: none;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 0 0 14px;
+      }
+      .toolbar.on {
+        display: flex;
+      }
+      .chip,
+      .play {
+        border: 1px solid var(--line);
+        background: var(--card);
+        color: var(--ink);
+        border-radius: 999px;
+        padding: 5px 10px;
+        font-size: 12px;
+        font-weight: 650;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .play {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: var(--on-accent);
+        padding: 8px 16px;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .chip[aria-pressed='true'] {
+        border-color: var(--accent);
+        color: var(--accent);
+        background: var(--halo);
+      }
+      .chip[data-filter='existing'][aria-pressed='true'] {
+        border-color: var(--ok);
+        color: var(--ok);
+        background: var(--ok-bg);
+      }
+      .chip[data-filter='proposed'][aria-pressed='true'] {
+        border-color: var(--info);
+        color: var(--info);
+        background: var(--info-bg);
+      }
+      .chip[data-filter='conflict'][aria-pressed='true'],
+      .chip[data-filter='removed'][aria-pressed='true'] {
+        border-color: var(--conflict);
+        color: var(--conflict);
+        background: var(--danger-bg);
+      }
+      .chip[data-filter='unchanged'][aria-pressed='true'] {
+        border-color: var(--accent);
+        color: var(--accent);
+        background: var(--halo);
+      }
+      .chip[data-filter='added'][aria-pressed='true'] {
+        border-color: var(--info);
+        color: var(--info);
+        background: var(--info-bg);
+      }
+      .chip[data-filter='changed'][aria-pressed='true'] {
+        border-color: var(--changed);
+        color: var(--changed);
+        background: var(--changed-bg);
+      }
+      .play[aria-pressed='true'] {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: var(--page);
+        box-shadow: none;
+      }
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 14px;
+        margin: 0 0 12px;
+        font-size: 11px;
+        color: var(--smoke);
+      }
+      .legend .swatch {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 99px;
+        margin-right: 5px;
+        vertical-align: middle;
+      }
+      .legend .key {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .legend .type-key {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 2px 8px;
+        color: var(--smoke);
+      }
+      .legend .box-key {
+        width: 14px;
+        height: 10px;
+        border-radius: 3px;
+        border: 1.5px solid var(--accent);
+        background: var(--page);
+      }
+      .legend .box-key.idle {
+        border-color: var(--line);
+        background: var(--page);
+        opacity: 0.7;
+      }
+      .legend .box-key.proposed {
+        border-style: dashed;
+        border-color: var(--info);
+        background: var(--info-bg);
+      }
+      .legend .box-key.conflict,
+      .legend .box-key.removed {
+        border-color: var(--conflict);
+        background: var(--danger-bg);
+      }
+      .legend .box-key.added {
+        border-style: dashed;
+        border-color: var(--info);
+        background: var(--info-bg);
+      }
+      .legend .box-key.changed {
+        border-color: var(--changed);
+        background: var(--changed-bg);
+      }
+      .legend .box-key.unchanged {
+        border-color: var(--accent);
+        background: var(--page);
+      }
+      .pr-bar {
+        display: none;
+        margin: 0 0 16px;
+        padding: 14px 16px;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+      }
+      .pr-bar.on {
+        display: block;
+      }
+      .pr-lead {
+        margin: 0 0 10px;
+        font-size: 15px;
+        font-weight: 650;
+        line-height: 1.4;
+      }
+      .pr-compare {
+        margin: 0 0 12px;
+        font-size: 12px;
+        color: var(--smoke);
+      }
+      .pr-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 16px;
+        align-items: center;
+        margin-top: 8px;
+      }
+      .pr-row-label {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--smoke);
+        min-width: 7rem;
+      }
+      .status-tag {
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 1px 7px;
+        border-radius: 999px;
+        margin-right: 6px;
+        vertical-align: middle;
+      }
+      .hop.unchanged .status-tag {
+        background: var(--halo);
+        color: var(--accent);
+      }
+      .hop.added .status-tag {
+        background: var(--info-bg);
+        color: var(--info);
+      }
+      .hop.removed .status-tag {
+        background: var(--danger-bg);
+        color: var(--conflict);
+      }
+      .hop.changed .status-tag {
+        background: var(--changed-bg);
+        color: var(--changed);
+      }
+      .hop-section-title {
+        margin: 16px 0 8px;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--smoke);
+      }
+      .hop-section-title.removed {
+        color: var(--conflict);
+      }
+      .hop-section-title.added {
+        color: var(--info);
+      }
+      .path-strip {
+        display: none;
+        align-items: center;
+        gap: 12px;
+        margin: 0 0 18px;
+        flex-wrap: wrap;
+        padding: 12px 14px;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+      }
+      .path-strip.on {
+        display: flex;
+      }
+      .path-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .path-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: 1px solid var(--line);
+        background: var(--card);
+        border-radius: 999px;
+        padding: 4px 10px 4px 4px;
+        font-size: 12px;
+        font-weight: 650;
+        cursor: pointer;
+        font-family: inherit;
+        color: var(--ink);
+        max-width: 280px;
+      }
+      .path-pill[aria-selected='true'] {
+        border-color: var(--accent);
+        background: var(--halo);
+        outline: 2px solid var(--accent);
+        outline-offset: 1px;
+      }
+      .path-pill .n {
+        width: 22px;
+        height: 22px;
+        border-radius: 99px;
+        background: var(--accent);
+        color: var(--on-accent);
+        font-size: 11px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .path-pill .lbl {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .layout {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      .story {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(360px, 1fr);
+        gap: 20px;
+        align-items: start;
+      }
+      @media (max-width: 1100px) {
+        .story {
+          grid-template-columns: 1fr;
+        }
+      }
+      .stage {
+        position: relative;
+      }
+      .hop-overlay {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 6;
+        overflow: visible;
+      }
+      .band {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 16px 18px 18px;
+        margin-bottom: 12px;
+        position: relative;
+        z-index: 1;
+        box-shadow: var(--shadow);
+      }
+      #band-infra {
+        background: linear-gradient(180deg, #eff6ff 0%, var(--card) 52%);
+        border-color: #bfdbfe;
+      }
+      #band-infra h2 {
+        color: var(--info);
+      }
+      #band-process {
+        background: linear-gradient(180deg, #ecfdf5 0%, var(--card) 52%);
+        border-color: #a7f3d0;
+      }
+      #band-process h2 {
+        color: var(--ok);
+      }
+      #band-blocks {
+        background: linear-gradient(180deg, #f5f3ff 0%, var(--card) 52%);
+        border-color: #c7d2fe;
+      }
+      #band-blocks h2 {
+        color: var(--accent);
+      }
+      .band h2,
+      .platform-summary {
+        margin: 0 0 10px;
+        font-size: 11px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--smoke);
+        font-weight: 650;
+      }
+      details.platform {
+        margin-bottom: 4px;
+      }
+      details.platform > summary {
+        cursor: pointer;
+        list-style: none;
+        margin: 0 0 10px;
+        font-size: 11px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--smoke);
+        font-weight: 650;
+      }
+      details.platform > summary::-webkit-details-marker {
+        display: none;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .box {
+        border: 1.5px solid var(--line);
+        background: var(--page);
+        color: var(--ink);
+        border-radius: 10px;
+        padding: 9px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        position: relative;
+        z-index: 5;
+      }
+      .box.used {
+        border-color: var(--accent);
+        background: var(--halo);
+        box-shadow: 0 6px 16px rgba(79, 70, 229, 0.12);
+      }
+      .box.unused {
+        opacity: var(--unused);
+        border-style: dotted;
+      }
+      .idle-tag {
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .box.proposed,
+      .column.proposed,
+      .layer.proposed {
+        border-style: dashed;
+        border-color: var(--info);
+      }
+      .box.conflict,
+      .column.conflict,
+      .layer.conflict {
+        border-color: var(--conflict);
+        background: var(--danger-bg);
+      }
+      .box[data-selected='1'],
+      .column[data-selected='1'],
+      .layer[data-selected='1'] {
+        outline: 3px solid var(--accent);
+        outline-offset: 3px;
+        z-index: 7;
+      }
+      .is-dim {
+        opacity: 0.12;
+      }
+      .columns {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: stretch;
+      }
+      .column {
+        min-width: 160px;
+        flex: 1 1 160px;
+        max-width: 240px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 8px;
+        background: var(--page);
+        position: relative;
+        z-index: 5;
+      }
+      .column.unused {
+        opacity: var(--unused);
+        border-style: dotted;
+      }
+      .column.used {
+        border-color: var(--accent);
+        background: var(--card);
+      }
+      .column .name {
+        font-size: 12px;
+        font-weight: 700;
+        margin: 0 0 8px;
+        padding: 2px 4px;
+      }
+      .column .kind {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--faint);
+        margin-left: 6px;
+      }
+      .layer {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 7px 8px;
+        margin-bottom: 6px;
+        background: var(--card);
+        font-size: 12px;
+        cursor: pointer;
+        position: relative;
+        z-index: 5;
+      }
+      .layer:last-child {
+        margin-bottom: 0;
+      }
+      .layer.used {
+        border-color: var(--accent);
+        background: var(--halo);
+      }
+      .layer .files {
+        margin: 4px 0 0;
+        padding: 0;
+        list-style: none;
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--smoke);
+        word-break: break-all;
+      }
+      .hops {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 16px 16px 10px;
+        box-shadow: var(--shadow);
+      }
+      .hops h2,
+      .inspector-panel h2 {
+        margin: 0 0 14px;
+        font-size: 11px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--smoke);
+        font-weight: 650;
+      }
+      .hop-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .hop {
+        display: grid;
+        grid-template-columns: 36px 1fr;
+        gap: 12px;
+        cursor: pointer;
+        border-radius: 12px;
+        padding: 12px 14px;
+        margin: 0;
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--accent);
+        background: var(--card);
+      }
+      .hop:hover {
+        background: var(--halo);
+      }
+      .hop[aria-selected='true'] {
+        background: var(--halo);
+        border-color: var(--accent);
+        box-shadow: 0 0 0 1px var(--accent);
+      }
+      .badge {
+        width: 32px;
+        height: 32px;
+        border-radius: 999px;
+        background: var(--accent);
+        color: var(--on-accent);
+        font-size: 13px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .hop .type {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--smoke);
+      }
+      .hop .label {
+        font-size: 14px;
+        font-weight: 700;
+        margin: 1px 0 4px;
+      }
+      .hop .work,
+      .hop .does {
+        font-size: 13px;
+        color: var(--ink);
+        line-height: 1.45;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        line-clamp: 3;
+        overflow: hidden;
+        margin: 2px 0 0;
+      }
+      .hop .why {
+        font-size: 12px;
+        color: var(--smoke);
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        line-clamp: 2;
+        overflow: hidden;
+        margin: 6px 0 0;
+      }
+      .hop .edge {
+        font-size: 11px;
+        color: var(--smoke);
+        font-family: var(--mono);
+      }
+      .hop.conflict,
+      .path-pill.conflict {
+        border-left-color: var(--conflict);
+      }
+      .hop.proposed,
+      .path-pill.proposed,
+      .hop.added,
+      .path-pill.added {
+        border-left-color: var(--info);
+      }
+      .hop.removed,
+      .path-pill.removed {
+        border-left-color: var(--conflict);
+      }
+      .hop.changed,
+      .path-pill.changed {
+        border-left-color: var(--changed);
+      }
+      .hop.removed .label {
+        text-decoration: line-through;
+        color: var(--smoke);
+      }
+      .hop.unknown .badge,
+      .path-pill.unknown .n {
+        background: var(--ink);
+        color: var(--page);
+      }
+      .hop.conflict .badge,
+      .path-pill.conflict .n {
+        background: var(--conflict);
+        color: var(--on-accent);
+      }
+      .hop.proposed .badge,
+      .path-pill.proposed .n,
+      .hop.added .badge,
+      .path-pill.added .n {
+        background: transparent;
+        border: 1.5px dashed var(--info);
+        color: var(--info);
+      }
+      .hop.removed .badge,
+      .path-pill.removed .n {
+        background: var(--conflict);
+        color: var(--on-accent);
+      }
+      .hop.changed .badge,
+      .path-pill.changed .n {
+        background: var(--changed);
+        color: var(--on-accent);
+      }
+      .unknown-banner,
+      .questions,
+      .findings {
+        background: var(--ink);
+        color: var(--on-accent);
+        border-radius: 12px;
+        padding: 12px 14px;
+        margin-bottom: 12px;
+        font-size: 13px;
+      }
+      .findings {
+        background: var(--card);
+        color: var(--ink);
+        border: 1px solid var(--line);
+      }
+      .questions h2,
+      .findings h2,
+      .unknown-banner {
+        font-size: 11px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        font-weight: 650;
+      }
+      .questions h2 {
+        margin: 0 0 8px;
+        color: var(--on-accent);
+      }
+      .findings h2 {
+        margin: 0 0 8px;
+        color: var(--smoke);
+      }
+      .questions ol,
+      .unknown-banner ul,
+      .findings ol {
+        margin: 6px 0 0;
+        padding-left: 18px;
+      }
+      .finding {
+        cursor: pointer;
+        margin-bottom: 8px;
+      }
+      .finding .sev {
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--smoke);
+      }
+      .finding.proposed .sev {
+        color: var(--info);
+      }
+      .finding.conflict .sev {
+        color: var(--conflict);
+      }
+      .inspector-panel {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-top: 3px solid var(--accent);
+        border-radius: 16px;
+        padding: 16px 18px 18px;
+        position: sticky;
+        top: 16px;
+        box-shadow: var(--shadow);
+        min-height: 12em;
+      }
+      .inspector {
+        margin-top: 0;
+        padding-top: 0;
+        border-top: none;
+        font-size: 13px;
+        color: var(--smoke);
+        min-height: 6em;
+      }
+      .inspector .k {
+        font-size: 11px;
+        letter-spacing: 0.02em;
+        font-weight: 650;
+        color: var(--smoke);
+        margin: 14px 0 5px;
+      }
+      .inspector .k:first-child {
+        margin-top: 0;
+      }
+      .inspector .v {
+        font-family: var(--font);
+        color: var(--ink);
+        word-break: normal;
+        overflow-wrap: anywhere;
+        margin: 0;
+      }
+      .inspector .v.mono {
+        font-family: var(--mono);
+        font-size: 12px;
+      }
+      .inspector .v.prose {
+        font-size: 15px;
+        line-height: 1.55;
+      }
+      .inspector .v.story {
+        font-size: 18px;
+        font-weight: 500;
+        line-height: 1.5;
+        margin: 0 0 2px;
+      }
+      .inspector a {
+        color: var(--accent);
+        overflow-wrap: anywhere;
+        word-break: normal;
+      }
+      .inspector-file {
+        margin-top: 16px;
+        padding-top: 12px;
+        border-top: 1px solid var(--line);
+        font-family: var(--mono);
+        font-size: 11px;
+        line-height: 1.45;
+        color: var(--smoke);
+      }
+      .inspector-file a {
+        overflow-wrap: anywhere;
+        word-break: normal;
+      }
+      .inspector .copy {
+        margin-left: 8px;
+        font-size: 10px;
+        cursor: pointer;
+        border: 1px solid var(--line);
+        background: var(--card);
+        border-radius: 6px;
+        padding: 1px 6px;
+        font-family: inherit;
+        color: var(--smoke);
+      }
+      details.grounding {
+        margin-top: 28px;
+        color: var(--smoke);
+        font-size: 12px;
+      }
+      details.grounding summary {
+        cursor: pointer;
+        font-weight: 650;
+      }
+      details.grounding table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 8px;
+        font-family: var(--mono);
+        font-size: 11px;
+      }
+      details.grounding td {
+        padding: 4px 6px;
+        border-top: 1px solid var(--line);
+        vertical-align: top;
+      }
+      .hint {
+        margin: 8px 0 0;
+        font-size: 11px;
+        color: var(--faint);
+      }
+      .boot-fail {
+        max-width: 52ch;
+        padding: 28px 32px;
+      }
+      .boot-fail h1 {
+        font-size: 22px;
+      }
+      .boot-fail p,
+      .boot-fail li {
+        color: var(--smoke);
+        line-height: 1.5;
+      }
+      .boot-fail a {
+        color: var(--accent);
+      }
+      .boot-fail code {
+        font-family: var(--mono);
+        font-size: 12px;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .hop-overlay path {
+          stroke-dasharray: none;
+          animation: none;
+        }
+      }
+      @keyframes hop-dash {
+        to {
+          stroke-dashoffset: -28;
+        }
+      }
+      .hop-overlay path.is-selected {
+        stroke-dasharray: 10 8;
+        animation: hop-dash 0.9s linear infinite;
+      }
+    </style>
+  </head>
+  <body data-shell="architecture-map-interactive" data-repo-root="">
+    <script type="application/json" id="map-data">
+      __MAP_JSON__
+    </script>
+    <header>
+      <p class="kicker" id="kicker"></p>
+      <h1 id="title"></h1>
+      <p class="intent" id="intent"></p>
+      <p class="verdict" id="verdict"></p>
+      <p class="hint" id="hint">
+        Click a hop, box, or finding. Path strip and Play path step the flow.
+        Filter the plan or the PR. Arrow keys move hops. Esc clears. Deep-link
+        with #hop= or #node=.
+      </p>
+    </header>
+    <div class="pr-bar" id="pr-bar" hidden></div>
+    <div class="legend" id="legend"></div>
+    <div class="toolbar" id="toolbar" role="toolbar" aria-label="Status filter">
+      <button class="chip" type="button" data-filter="all" aria-pressed="true">
+        All
+      </button>
+      <button class="chip" type="button" data-filter="existing">
+        Existing
+      </button>
+      <button class="chip" type="button" data-filter="proposed">
+        Proposed
+      </button>
+      <button class="chip" type="button" data-filter="conflict">
+        Conflict
+      </button>
+      <button class="chip" type="button" data-view="before">Before</button>
+      <button class="chip" type="button" data-view="after">After</button>
+      <button class="chip" type="button" data-filter="unchanged">
+        Unchanged
+      </button>
+      <button class="chip" type="button" data-filter="added">Added</button>
+      <button class="chip" type="button" data-filter="removed">Removed</button>
+      <button class="chip" type="button" data-filter="changed">Changed</button>
+    </div>
+    <div class="path-strip" id="path-strip">
+      <button class="play" type="button" id="play-path" aria-pressed="false">
+        Play path
+      </button>
+      <div class="path-pills" id="path-pills"></div>
+    </div>
+    <div class="questions" id="questions" hidden></div>
+    <div id="findings"></div>
+    <div class="layout">
+      <div class="stage-col">
+        <details class="platform" id="platform" open>
+          <summary id="platform-summary">Platform</summary>
+          <div class="stage" id="stage">
+            <svg class="hop-overlay" id="hop-overlay" aria-hidden="true"></svg>
+            <section class="band" id="band-infra"></section>
+            <section class="band" id="band-process"></section>
+            <section class="band" id="band-blocks"></section>
+          </div>
+        </details>
+        <div id="unknown"></div>
+      </div>
+      <div class="story">
+        <aside class="hops" id="hops"></aside>
+        <aside class="inspector-panel">
+          <h2>This step</h2>
+          <div class="inspector" id="inspector"></div>
+        </aside>
+      </div>
+      <details class="grounding" id="grounding"></details>
+    </div>
+    <script>
+      const PALETTE = {
+        accent: '#4F46E5',
+        black: '#0F172A',
+        white: '#FFFFFF',
+        ash: '#94A3B8',
+        bad: '#DC2626',
+        ok: '#059669',
+        info: '#2563EB',
+        changed: '#7C3AED',
+      };
+      // Mirrors TOUCH_TYPES in runtime/schema.ts. Keep the two lists identical.
+      const TOUCH_TYPE_NAMES = [
+        'HTTP',
+        'gRPC',
+        'GraphQL',
+        'WebSocket',
+        'SSE',
+        'webhook',
+        'message bus',
+        'cron',
+        'workflow',
+        'database',
+        'cache',
+        'object store',
+        'secrets',
+        'authz',
+        'import',
+        'spawn',
+        'UNKNOWN',
+      ];
+      const DEFAULT_PREVIEW = 'fixtures/flow-create-order.map.json';
+      const PREVIEW_MAPS = [
+        'fixtures/repo-sample.map.json',
+        'fixtures/flow-create-order.map.json',
+        'fixtures/plan-blocked-missing-entry.map.json',
+        'fixtures/plan-fail-orders-cache-cron.map.json',
+        'fixtures/pr-blocked-missing-flow.map.json',
+        'fixtures/pr-create-order-outbox.map.json',
+      ];
+      const el = document.getElementById('map-data');
+      const raw = (el && el.textContent) || '';
+      const ui = {
+        filter: 'all',
+        view: 'after',
+        hop: 0,
+        node: '',
+        playing: false,
+      };
+      let playTimer = 0;
+      let mapRef = null;
+      start();
+
+      function parseInjectedMapJson(text) {
+        const trimmed = String(text || '').trim();
+        if (!trimmed || trimmed.charAt(0) !== '{') return null;
+        try {
+          const map = JSON.parse(trimmed);
+          return map && map.title ? map : null;
+        } catch {
+          return null;
+        }
+      }
+
+      function mapQueryPath() {
+        try {
+          const searchParams = new URLSearchParams(location.search);
+          const spec = searchParams.get('map') || '';
+          if (!spec) return '';
+          if (/^[a-z][a-z0-9+.-]*:/i.test(spec) || spec.indexOf('//') === 0) {
+            return '';
+          }
+          if (!/\.map\.json$/i.test(spec)) return '';
+          return spec;
+        } catch {
+          return '';
+        }
+      }
+
+      function boot(map) {
+        mapRef = map;
+        render(map);
+        bind(map);
+        applyHash(map);
+        syncSelection(map);
+      }
+
+      function bootFail(detail) {
+        const panel = document.createElement('div');
+        panel.className = 'boot-fail';
+        const h = document.createElement('h1');
+        h.textContent = 'Map JSON was not injected';
+        const p = document.createElement('p');
+        p.textContent =
+          'This URL is the locked shell, not a rendered map. A static file server serves the placeholder, not injected JSON. Open a rendered HTML, or pass ?map= to a .map.json file.';
+        const pre = document.createElement('p');
+        const code = document.createElement('code');
+        code.textContent = 'shell.html?map=fixtures/flow-create-order.map.json';
+        pre.appendChild(code);
+        const p2 = document.createElement('p');
+        p2.textContent =
+          'Or run bun runtime/cli.ts render --in <map.json> --out <file.html> and open that file.';
+        const ul = document.createElement('ul');
+        PREVIEW_MAPS.forEach(function (path) {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = '?map=' + encodeURIComponent(path);
+          a.textContent = path;
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+        const why = document.createElement('p');
+        why.textContent = detail || '';
+        panel.appendChild(h);
+        panel.appendChild(p);
+        panel.appendChild(pre);
+        panel.appendChild(p2);
+        panel.appendChild(ul);
+        if (detail) panel.appendChild(why);
+        document.body.innerHTML = '';
+        document.body.appendChild(panel);
+      }
+
+      function start() {
+        const injected = parseInjectedMapJson(raw);
+        if (injected) {
+          boot(injected);
+          return;
+        }
+        const spec = mapQueryPath() || DEFAULT_PREVIEW;
+        fetch(spec)
+          .then(function (res) {
+            if (!res.ok) throw new Error(spec + ' HTTP ' + res.status);
+            return res.json();
+          })
+          .then(function (map) {
+            if (!map || !map.title) throw new Error('empty map');
+            boot(map);
+          })
+          .catch(function (err) {
+            bootFail(err && err.message ? err.message : String(err));
+          });
+      }
+
+      function st(n) {
+        return (n && n.status) || '';
+      }
+
+      function pathColor(hop, selected, related) {
+        if (st(hop) === 'conflict' || st(hop) === 'removed') return PALETTE.bad;
+        if (st(hop) === 'proposed' || st(hop) === 'added') return PALETTE.info;
+        if (st(hop) === 'changed') return PALETTE.changed;
+        if (hop.type === 'UNKNOWN') return PALETTE.black;
+        if (selected || related) return PALETTE.accent;
+        return PALETTE.ash;
+      }
+
+      function hopShown(hop) {
+        if (mapRef && mapRef.query && mapRef.query.mode === 'pr') {
+          if (hop.n === ui.hop) return true;
+          return prPathHops(mapRef).some(function (h) {
+            return h.n === hop.n;
+          });
+        }
+        const status = st(hop);
+        if (ui.filter === 'all') return true;
+        return status === ui.filter;
+      }
+
+      function prPathHops(map) {
+        const hops = map.hops || [];
+        if (ui.filter !== 'all') {
+          return hops.filter(function (h) {
+            return st(h) === ui.filter;
+          });
+        }
+        return hops.filter(function (h) {
+          const s = st(h);
+          if (ui.view === 'before') {
+            return s === 'unchanged' || s === 'removed' || s === 'changed';
+          }
+          return s === 'unchanged' || s === 'added' || s === 'changed';
+        });
+      }
+
+      function prAsideHops(map) {
+        if (ui.filter !== 'all') return [];
+        const hops = map.hops || [];
+        return hops.filter(function (h) {
+          const s = st(h);
+          return ui.view === 'before' ? s === 'added' : s === 'removed';
+        });
+      }
+
+      function listedHops(map) {
+        if (map.query && map.query.mode === 'pr') {
+          return prPathHops(map).concat(prAsideHops(map));
+        }
+        return map.hops || [];
+      }
+
+      function visibleHops(map) {
+        if (map.query && map.query.mode === 'pr') {
+          return listedHops(map);
+        }
+        return (map.hops || []).filter(hopShown);
+      }
+
+      function prStatusWord(status) {
+        if (status === 'unchanged') return 'same';
+        if (status === 'added') return 'added';
+        if (status === 'removed') return 'removed';
+        if (status === 'changed') return 'changed';
+        return status;
+      }
+
+      function statusShown(status, unused) {
+        if (ui.view === 'before' && status === 'added') return false;
+        if (ui.view === 'after' && status === 'removed') return false;
+        if (ui.filter === 'all') return true;
+        if (ui.filter === 'existing')
+          return !unused && (status === 'existing' || status === '');
+        if (ui.filter === 'proposed') return status === 'proposed';
+        if (ui.filter === 'conflict') return status === 'conflict';
+        if (ui.filter === 'unchanged') return status === 'unchanged';
+        if (ui.filter === 'added') return status === 'added';
+        if (ui.filter === 'removed') return status === 'removed';
+        if (ui.filter === 'changed') return status === 'changed';
+        return true;
+      }
+
+      function isBlockedMap(map) {
+        return (
+          map.verdict === 'blocked' ||
+          (map.query.mode === 'pr' && !(map.hops || []).length)
+        );
+      }
+
+      function repoRoot() {
+        return (document.body.getAttribute('data-repo-root') || '').replace(
+          /\/$/,
+          ''
+        );
+      }
+
+      function vscodeHref(path) {
+        const root = repoRoot();
+        if (!root || !path) return '';
+        const abs = path.charAt(0) === '/' ? path : root + '/' + path;
+        return 'vscode://file' + abs;
+      }
+
+      function render(map) {
+        document.title = map.title + ' — architecture map';
+        const hops = map.hops || [];
+        const when = map.generatedAt
+          ? String(map.generatedAt)
+              .replace('T', ' ')
+              .replace(/\.\d+Z$/, 'Z')
+          : '';
+        const isRepo = map.query.mode === 'repo';
+        const sizeBit = hops.length
+          ? hops.length + ' hops'
+          : isRepo
+            ? (map.columns || []).length + ' code units'
+            : '';
+        const kickerBits =
+          map.query.mode === 'pr' && map.compare
+            ? [
+                map.compare.pr ? 'PR ' + map.compare.pr : 'PR',
+                'this PR vs ' + map.compare.base,
+                when,
+              ]
+            : [map.query.mode.toUpperCase(), map.query.name, sizeBit, when];
+        document.getElementById('kicker').textContent = kickerBits
+          .filter(Boolean)
+          .join('  ·  ');
+        document.getElementById('title').textContent = map.title;
+        document.getElementById('intent').textContent = map.intent;
+        const hint = document.getElementById('hint');
+        if (hint) {
+          hint.textContent =
+            map.query.mode === 'pr'
+              ? 'The list is the path that still runs. Removed steps sit in their own section — they are not on the diagram. Switch to Before this PR to walk the old path.'
+              : isRepo
+                ? 'This is the repository surface — every service, process, and code unit found on disk, with no path traced. Click a box to see its files. Trace a path with the flow command. Deep-link with #node=.'
+                : 'Click a hop, box, or finding. Path strip and Play path step the flow. Filter the plan. Arrow keys move hops. Esc clears. Deep-link with #hop= or #node=.';
+        }
+        paintVerdict(map);
+        paintLegend(map);
+        paintQuestions(map.questions || []);
+        paintToolbar(map);
+        paintPrBar(map);
+        paintPathStrip(map);
+        paintFindings(map);
+        paintPlatform(map);
+        paintBand('band-infra', 'Infra', map.infra);
+        paintBand('band-process', 'Processes', map.processes);
+        paintColumns(map.columns);
+        paintHops(map);
+        paintUnknown(map.unknown || []);
+        paintGrounding(map.grounding || []);
+        applyFilter();
+      }
+
+      function paintVerdict(map) {
+        const root = document.getElementById('verdict');
+        if (!map.verdict) {
+          root.className = 'verdict';
+          root.textContent = '';
+          return;
+        }
+        root.className = 'verdict on ' + map.verdict;
+        root.textContent = 'verdict  ·  ' + map.verdict.replace(/-/g, ' ');
+      }
+
+      function paintLegend(map) {
+        const root = document.getElementById('legend');
+        root.innerHTML = '';
+        const types = [];
+        (map.hops || []).forEach(function (h) {
+          if (h.type && types.indexOf(h.type) === -1) types.push(h.type);
+        });
+        // Only the touch types that actually appear on this map are listed.
+        // TOUCH_TYPE_NAMES stays as the full vocabulary for tooling/tests.
+        types.forEach(function (t) {
+          const item = document.createElement('span');
+          item.className = 'key type-key';
+          item.textContent = t;
+          root.appendChild(item);
+        });
+        function boxKey(cls, label) {
+          const item = document.createElement('span');
+          item.className = 'key';
+          const sw = document.createElement('span');
+          sw.className = 'box-key' + (cls ? ' ' + cls : '');
+          item.appendChild(sw);
+          item.appendChild(document.createTextNode(label));
+          root.appendChild(item);
+        }
+        boxKey('', 'used');
+        boxKey('idle', 'idle');
+        if (map.query.mode === 'plan') {
+          boxKey('proposed', 'proposed');
+          boxKey('conflict', 'conflict');
+        }
+        if (map.query.mode === 'pr') {
+          boxKey('unchanged', 'same as before');
+          boxKey('added', 'added by this PR');
+          boxKey('removed', 'removed by this PR');
+          boxKey('changed', 'changed on this PR');
+        }
+      }
+
+      function paintToolbar(map) {
+        const root = document.getElementById('toolbar');
+        root.innerHTML = '';
+        const mode = map.query && map.query.mode;
+        const on = mode === 'plan';
+        root.className = 'toolbar' + (on ? ' on' : '');
+        if (!on) return;
+        function chip(attr, value, label, pressed) {
+          const b = document.createElement('button');
+          b.className = 'chip';
+          b.type = 'button';
+          b.setAttribute(attr, value);
+          b.setAttribute('aria-pressed', pressed ? 'true' : 'false');
+          b.textContent = label;
+          root.appendChild(b);
+        }
+        root.setAttribute('aria-label', 'Status filter');
+        chip('data-filter', 'all', 'All', ui.filter === 'all');
+        chip('data-filter', 'existing', 'Existing', ui.filter === 'existing');
+        chip('data-filter', 'proposed', 'Proposed', ui.filter === 'proposed');
+        chip('data-filter', 'conflict', 'Conflict', ui.filter === 'conflict');
+      }
+
+      function countPhrase(n, one, many) {
+        return n + ' ' + (n === 1 ? one : many);
+      }
+
+      function paintPrBar(map) {
+        const root = document.getElementById('pr-bar');
+        if (!root) return;
+        root.innerHTML = '';
+        if (map.query.mode !== 'pr' || isBlockedMap(map)) {
+          root.className = 'pr-bar';
+          root.hidden = true;
+          return;
+        }
+        root.hidden = false;
+        root.className = 'pr-bar on';
+        const hops = map.hops || [];
+        const c = { unchanged: 0, added: 0, removed: 0, changed: 0 };
+        hops.forEach(function (h) {
+          if (c[st(h)] !== undefined) c[st(h)] += 1;
+        });
+        const parts = [];
+        if (c.added)
+          parts.push(
+            c.added === 1 ? 'adds 1 step' : 'adds ' + c.added + ' steps'
+          );
+        if (c.removed)
+          parts.push(
+            c.removed === 1
+              ? 'removes 1 step'
+              : 'removes ' + c.removed + ' steps'
+          );
+        if (c.changed)
+          parts.push(
+            c.changed === 1
+              ? 'changes 1 step'
+              : 'changes ' + c.changed + ' steps'
+          );
+        const lead = document.createElement('p');
+        lead.className = 'pr-lead';
+        if (parts.length) {
+          lead.textContent =
+            'This PR ' +
+            parts.join(', ') +
+            (c.unchanged
+              ? '. ' +
+                countPhrase(
+                  c.unchanged,
+                  'step is the same as before',
+                  'steps are the same as before'
+                ) +
+                '.'
+              : '.');
+        } else {
+          lead.textContent = 'This PR does not add, remove, or change any steps.';
+        }
+        root.appendChild(lead);
+        if (map.compare) {
+          const cmp = document.createElement('p');
+          cmp.className = 'pr-compare';
+          cmp.textContent =
+            'Comparing this PR to ' +
+            map.compare.base +
+            (map.compare.pr ? ' (PR ' + map.compare.pr + ')' : '') +
+            '.';
+          root.appendChild(cmp);
+        }
+        function row(label, chips) {
+          const line = document.createElement('div');
+          line.className = 'pr-row';
+          const lab = document.createElement('span');
+          lab.className = 'pr-row-label';
+          lab.textContent = label;
+          line.appendChild(lab);
+          chips.forEach(function (spec) {
+            const b = document.createElement('button');
+            b.className = 'chip';
+            b.type = 'button';
+            b.setAttribute(spec.attr, spec.value);
+            b.setAttribute(
+              'aria-pressed',
+              spec.pressed ? 'true' : 'false'
+            );
+            b.textContent = spec.label;
+            line.appendChild(b);
+          });
+          root.appendChild(line);
+        }
+        row('Show path', [
+          {
+            attr: 'data-view',
+            value: 'after',
+            label: 'On this PR',
+            pressed: ui.view !== 'before',
+          },
+          {
+            attr: 'data-view',
+            value: 'before',
+            label: 'Before this PR',
+            pressed: ui.view === 'before',
+          },
+        ]);
+        const focus = [{ attr: 'data-filter', value: 'all', label: 'Whole path', pressed: ui.filter === 'all' }];
+        if (c.added)
+          focus.push({
+            attr: 'data-filter',
+            value: 'added',
+            label: countPhrase(c.added, 'added', 'added'),
+            pressed: ui.filter === 'added',
+          });
+        if (c.removed)
+          focus.push({
+            attr: 'data-filter',
+            value: 'removed',
+            label: countPhrase(c.removed, 'removed', 'removed'),
+            pressed: ui.filter === 'removed',
+          });
+        if (c.changed)
+          focus.push({
+            attr: 'data-filter',
+            value: 'changed',
+            label: countPhrase(c.changed, 'changed', 'changed'),
+            pressed: ui.filter === 'changed',
+          });
+        if (c.unchanged)
+          focus.push({
+            attr: 'data-filter',
+            value: 'unchanged',
+            label: countPhrase(c.unchanged, 'same', 'same'),
+            pressed: ui.filter === 'unchanged',
+          });
+        row('Focus', focus);
+      }
+
+      function paintQuestions(items) {
+        const root = document.getElementById('questions');
+        root.innerHTML = '';
+        if (!items.length) {
+          root.hidden = true;
+          return;
+        }
+        root.hidden = false;
+        const h = document.createElement('h2');
+        h.textContent = 'Ask — do not guess';
+        root.appendChild(h);
+        const ol = document.createElement('ol');
+        items.forEach(function (q) {
+          const li = document.createElement('li');
+          const ask = document.createElement('div');
+          ask.textContent = q.ask;
+          const because = document.createElement('div');
+          because.style.opacity = '0.75';
+          because.style.marginTop = '2px';
+          because.textContent = q.because;
+          li.appendChild(ask);
+          li.appendChild(because);
+          ol.appendChild(li);
+        });
+        root.appendChild(ol);
+      }
+
+      function paintPlatform(map) {
+        const root = document.getElementById('platform');
+        const summary = document.getElementById('platform-summary');
+        const blocked = isBlockedMap(map);
+        root.open = !blocked;
+        summary.textContent = blocked
+          ? 'Platform (idle) — everything found on disk stays on the map'
+          : 'Platform';
+      }
+
+      function paintBand(id, title, nodes) {
+        const root = document.getElementById(id);
+        root.innerHTML = '';
+        const h = document.createElement('h2');
+        h.textContent = title;
+        root.appendChild(h);
+        const row = document.createElement('div');
+        row.className = 'row';
+        (nodes || []).forEach(function (n) {
+          const box = document.createElement('div');
+          box.className =
+            'box ' + (n.used ? 'used' : 'unused') + (st(n) ? ' ' + st(n) : '');
+          box.appendChild(document.createTextNode(n.label || n.id));
+          if (!n.used) {
+            const tag = document.createElement('span');
+            tag.className = 'idle-tag';
+            tag.textContent = 'idle';
+            box.appendChild(tag);
+          }
+          box.title = n.id + (st(n) ? ' · ' + st(n) : '');
+          box.setAttribute('data-node', n.id);
+          box.setAttribute('tabindex', '0');
+          box.setAttribute('role', 'button');
+          if (st(n)) box.setAttribute('data-status', st(n));
+          row.appendChild(box);
+        });
+        root.appendChild(row);
+      }
+
+      function paintColumns(columns) {
+        const root = document.getElementById('band-blocks');
+        root.innerHTML = '';
+        const h = document.createElement('h2');
+        h.textContent = 'Architecture blocks';
+        root.appendChild(h);
+        const wrap = document.createElement('div');
+        wrap.className = 'columns';
+        (columns || []).forEach(function (col) {
+          const card = document.createElement('div');
+          card.className =
+            'column ' +
+            (col.used ? 'used' : 'unused') +
+            (st(col) ? ' ' + st(col) : '');
+          card.setAttribute('data-node', col.id);
+          if (st(col)) card.setAttribute('data-status', st(col));
+          const name = document.createElement('div');
+          name.className = 'name';
+          name.appendChild(document.createTextNode(col.label || col.id));
+          const kind = document.createElement('span');
+          kind.className = 'kind';
+          kind.textContent = col.kind;
+          name.appendChild(kind);
+          card.appendChild(name);
+          (col.layers || []).forEach(function (layer) {
+            const layerEl = document.createElement('div');
+            layerEl.className =
+              'layer ' +
+              (layer.used ? 'used' : 'unused') +
+              (st(layer) ? ' ' + st(layer) : '');
+            layerEl.setAttribute('data-node', layer.id);
+            layerEl.setAttribute('tabindex', '0');
+            layerEl.setAttribute('role', 'button');
+            if (st(layer)) layerEl.setAttribute('data-status', st(layer));
+            layerEl.appendChild(document.createTextNode(layer.label));
+            if (layer.files && layer.files.length) {
+              const ul = document.createElement('ul');
+              ul.className = 'files';
+              layer.files.forEach(function (f) {
+                const li = document.createElement('li');
+                li.textContent = f;
+                li.title = f;
+                ul.appendChild(li);
+              });
+              layerEl.appendChild(ul);
+            }
+            card.appendChild(layerEl);
+          });
+          wrap.appendChild(card);
+        });
+        root.appendChild(wrap);
+      }
+
+      function paintPathStrip(map) {
+        const wrap = document.getElementById('path-strip');
+        const pills = document.getElementById('path-pills');
+        const play = document.getElementById('play-path');
+        pills.innerHTML = '';
+        const hops =
+          map.query && map.query.mode === 'pr'
+            ? prPathHops(map)
+            : map.hops || [];
+        wrap.className = 'path-strip' + (hops.length ? ' on' : '');
+        play.disabled = !hops.length;
+        hops.forEach(function (hop) {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className =
+            'path-pill' +
+            (hop.type === 'UNKNOWN' ? ' unknown' : '') +
+            (st(hop) ? ' ' + st(hop) : '');
+          btn.setAttribute('data-hop', String(hop.n));
+          if (st(hop)) btn.setAttribute('data-status', st(hop));
+          const n = document.createElement('span');
+          n.className = 'n';
+          n.textContent = String(hop.n);
+          n.style.background =
+            hop.type === 'UNKNOWN' ||
+            st(hop) === 'conflict' ||
+            st(hop) === 'proposed' ||
+            st(hop) === 'added' ||
+            st(hop) === 'removed' ||
+            st(hop) === 'changed'
+              ? ''
+              : PALETTE.accent;
+          n.style.color =
+            hop.type === 'UNKNOWN' ||
+            st(hop) === 'conflict' ||
+            st(hop) === 'proposed' ||
+            st(hop) === 'added' ||
+            st(hop) === 'removed' ||
+            st(hop) === 'changed'
+              ? ''
+              : PALETTE.white;
+          const lbl = document.createElement('span');
+          lbl.className = 'lbl';
+          lbl.textContent = hop.label;
+          btn.title = hop.work
+            ? hop.type + ' · ' + hop.label + '\n' + hop.work
+            : hop.because
+              ? hop.type + ' · ' + hop.label + '\n' + hop.because
+              : hop.type + ' · ' + hop.label;
+          btn.appendChild(n);
+          btn.appendChild(lbl);
+          pills.appendChild(btn);
+        });
+      }
+
+      function hopWorkPreview(hop) {
+        if (ui.view === 'before' && hop.beforeWork) return hop.beforeWork;
+        return hop.work;
+      }
+
+      function paintHopRow(hop) {
+        const row = document.createElement('div');
+        row.className =
+          'hop' +
+          (hop.type === 'UNKNOWN' ? ' unknown' : '') +
+          (st(hop) ? ' ' + st(hop) : '');
+        row.setAttribute('data-hop', String(hop.n));
+        row.setAttribute('data-from', hop.from);
+        row.setAttribute('data-to', hop.to);
+        if (st(hop)) row.setAttribute('data-status', st(hop));
+        row.setAttribute('tabindex', '0');
+        row.setAttribute('role', 'button');
+        row.style.borderLeftColor =
+          st(hop) === 'conflict' || st(hop) === 'removed'
+            ? PALETTE.bad
+            : st(hop) === 'proposed' || st(hop) === 'added'
+              ? PALETTE.info
+              : st(hop) === 'changed'
+                ? PALETTE.changed
+                : hop.type === 'UNKNOWN'
+                  ? PALETTE.black
+                  : PALETTE.accent;
+        const badge = document.createElement('div');
+        badge.className = 'badge';
+        badge.textContent = String(hop.n);
+        badge.style.background =
+          hop.type === 'UNKNOWN' ||
+          st(hop) === 'conflict' ||
+          st(hop) === 'proposed' ||
+          st(hop) === 'added' ||
+          st(hop) === 'removed' ||
+          st(hop) === 'changed'
+            ? ''
+            : PALETTE.accent;
+        const body = document.createElement('div');
+        const type = document.createElement('div');
+        type.className = 'type';
+        if (st(hop) && prStatusWord(st(hop))) {
+          const tag = document.createElement('span');
+          tag.className = 'status-tag';
+          tag.textContent = prStatusWord(st(hop));
+          type.appendChild(tag);
+        }
+        type.appendChild(document.createTextNode(hop.type));
+        const label = document.createElement('div');
+        label.className = 'label';
+        label.textContent = hop.label;
+        const edge = document.createElement('div');
+        edge.className = 'edge';
+        edge.textContent = hop.from + ' → ' + hop.to;
+        edge.title = hop.source;
+        body.appendChild(type);
+        body.appendChild(label);
+        const workText = hopWorkPreview(hop);
+        if (workText) {
+          const work = document.createElement('div');
+          work.className = 'work';
+          work.textContent = workText;
+          body.appendChild(work);
+        }
+        if (hop.because && ui.view !== 'before') {
+          const why = document.createElement('div');
+          why.className = 'why';
+          why.textContent = hop.because;
+          body.appendChild(why);
+        }
+        body.appendChild(edge);
+        row.appendChild(badge);
+        row.appendChild(body);
+        return row;
+      }
+
+      function paintHops(map) {
+        const root = document.getElementById('hops');
+        root.innerHTML = '';
+        const h = document.createElement('h2');
+        const pr = map.query && map.query.mode === 'pr';
+        if (isBlockedMap(map)) h.textContent = 'No path yet';
+        else if (pr && ui.filter !== 'all')
+          h.textContent =
+            ui.filter === 'unchanged'
+              ? 'Same as before'
+              : ui.filter === 'added'
+                ? 'Added by this PR'
+                : ui.filter === 'removed'
+                  ? 'Removed by this PR'
+                  : ui.filter === 'changed'
+                    ? 'Changed on this PR'
+                    : 'Path';
+        else if (pr)
+          h.textContent =
+            ui.view === 'before' ? 'Path before this PR' : 'Path on this PR';
+        else if (map.query && map.query.mode === 'repo')
+          h.textContent = 'Surface';
+        else h.textContent = 'Path';
+        root.appendChild(h);
+        const hops = map.hops || [];
+        if (!hops.length) {
+          const empty = document.createElement('p');
+          empty.className = 'hint';
+          empty.textContent = isBlockedMap(map)
+            ? 'Answer the questions in chat first. This page does not guess hops.'
+            : map.query && map.query.mode === 'repo'
+              ? 'No path traced. This map is the repository surface: what exists and how it is laid out. Run the flow command with a feature or flow name to trace a path through it.'
+              : 'No hops.';
+          root.appendChild(empty);
+          return;
+        }
+        const pathHops = pr ? prPathHops(map) : hops;
+        const asideHops = pr ? prAsideHops(map) : [];
+        const list = document.createElement('div');
+        list.className = 'hop-list';
+        pathHops.forEach(function (hop) {
+          list.appendChild(paintHopRow(hop));
+        });
+        root.appendChild(list);
+        if (!asideHops.length) return;
+        const asideTitle = document.createElement('h3');
+        asideTitle.className =
+          'hop-section-title ' +
+          (ui.view === 'before' ? 'added' : 'removed');
+        asideTitle.textContent =
+          ui.view === 'before'
+            ? 'Not on the old path — this PR adds them'
+            : 'Removed by this PR — these steps no longer run';
+        root.appendChild(asideTitle);
+        const aside = document.createElement('div');
+        aside.className = 'hop-list';
+        asideHops.forEach(function (hop) {
+          aside.appendChild(paintHopRow(hop));
+        });
+        root.appendChild(aside);
+      }
+
+      function paintFindings(map) {
+        const root = document.getElementById('findings');
+        root.innerHTML = '';
+        root.className = '';
+        const items = (map && map.findings) || [];
+        if (!items.length) return;
+        root.className = 'findings';
+        const h = document.createElement('h2');
+        h.textContent =
+          map.query && map.query.mode === 'pr'
+            ? 'What this PR changes'
+            : 'Findings';
+        root.appendChild(h);
+        const ol = document.createElement('ol');
+        items.forEach(function (f) {
+          const li = document.createElement('li');
+          li.className = 'finding ' + (f.severity || '');
+          li.setAttribute('data-finding', f.id);
+          if (f.nodeId) li.setAttribute('data-node', f.nodeId);
+          if (f.hop) li.setAttribute('data-hop', String(f.hop));
+          const sev = document.createElement('div');
+          sev.className = 'sev';
+          const pr = map.query && map.query.mode === 'pr';
+          sev.textContent = pr
+            ? f.severity === 'proposed'
+              ? 'change'
+              : f.severity === 'info'
+                ? 'note'
+                : f.severity || ''
+            : f.severity || '';
+          const title = document.createElement('div');
+          title.style.fontWeight = '650';
+          title.textContent = f.title;
+          const detail = document.createElement('div');
+          detail.style.color = 'var(--smoke)';
+          detail.textContent = f.detail;
+          li.appendChild(sev);
+          li.appendChild(title);
+          li.appendChild(detail);
+          ol.appendChild(li);
+        });
+        root.appendChild(ol);
+      }
+
+      function paintUnknown(items) {
+        const root = document.getElementById('unknown');
+        root.innerHTML = '';
+        if (!items.length) return;
+        const box = document.createElement('div');
+        box.className = 'unknown-banner';
+        box.appendChild(
+          document.createTextNode('Unknown — not proven from code this turn')
+        );
+        const ul = document.createElement('ul');
+        items.forEach(function (item) {
+          const li = document.createElement('li');
+          li.textContent = item;
+          ul.appendChild(li);
+        });
+        box.appendChild(ul);
+        root.appendChild(box);
+      }
+
+      function paintGrounding(rows) {
+        const root = document.getElementById('grounding');
+        root.innerHTML = '';
+        const summary = document.createElement('summary');
+        summary.textContent = 'Grounding (' + rows.length + ')';
+        root.appendChild(summary);
+        const table = document.createElement('table');
+        rows.forEach(function (row) {
+          const tr = document.createElement('tr');
+          const a = document.createElement('td');
+          a.textContent = row.id;
+          const b = document.createElement('td');
+          appendFileRef(b, row.path);
+          tr.appendChild(a);
+          tr.appendChild(b);
+          table.appendChild(tr);
+        });
+        root.appendChild(table);
+      }
+
+      function appendFileRef(parent, path) {
+        const href = vscodeHref(path);
+        if (href) {
+          const a = document.createElement('a');
+          a.href = href;
+          a.textContent = path;
+          parent.appendChild(a);
+        } else {
+          parent.appendChild(document.createTextNode(path));
+        }
+        const copy = document.createElement('button');
+        copy.type = 'button';
+        copy.className = 'copy';
+        copy.textContent = 'copy';
+        copy.setAttribute('data-copy', path);
+        parent.appendChild(copy);
+      }
+
+      function filesForNode(map, id) {
+        const out = [];
+        (map.columns || []).forEach(function (col) {
+          if (col.id === id && col.layers) {
+            col.layers.forEach(function (layer) {
+              (layer.files || []).forEach(function (f) {
+                if (out.indexOf(f) === -1) out.push(f);
+              });
+            });
+          }
+          (col.layers || []).forEach(function (layer) {
+            if (layer.id === id) {
+              (layer.files || []).forEach(function (f) {
+                if (out.indexOf(f) === -1) out.push(f);
+              });
+            }
+          });
+        });
+        return out;
+      }
+
+      function hopsTouching(map, id) {
+        return (map.hops || []).filter(function (h) {
+          return h.from === id || h.to === id;
+        });
+      }
+
+      function lookupNode(map, id) {
+        let found = null;
+        function take(n) {
+          if (n && n.id === id) found = n;
+        }
+        (map.infra || []).forEach(take);
+        (map.processes || []).forEach(take);
+        (map.columns || []).forEach(function (col) {
+          take(col);
+          (col.layers || []).forEach(take);
+        });
+        return found;
+      }
+
+      function paintInspector(map) {
+        const root = document.getElementById('inspector');
+        if (!root) return;
+        root.innerHTML = '';
+        const k = function (label, valueNode, klass) {
+          const a = document.createElement('div');
+          a.className = 'k';
+          a.textContent = label;
+          const b = document.createElement('div');
+          b.className = klass ? 'v ' + klass : 'v';
+          if (typeof valueNode === 'string') b.textContent = valueNode;
+          else if (valueNode) b.appendChild(valueNode);
+          root.appendChild(a);
+          root.appendChild(b);
+        };
+        const hop = (map.hops || []).find(function (h) {
+          return h.n === ui.hop;
+        });
+        if (hop) {
+          if (hop.beforeWork) {
+            k('before', hop.beforeWork, 'story');
+            k('on this PR', hop.work, 'story');
+          } else if (hop.work) {
+            const story = document.createElement('p');
+            story.className = 'v story';
+            story.textContent = hop.work;
+            root.appendChild(story);
+          }
+          if (hop.in) k('arrives with', hop.in, 'prose');
+          if (hop.out) k('then', hop.out, 'prose');
+          if (hop.fail) k('if this fails', hop.fail, 'prose');
+          if (hop.because) k('why', hop.because, 'prose');
+          if (hop.not) k('not this', hop.not, 'prose');
+          const file = document.createElement('div');
+          file.className = 'inspector-file';
+          appendFileRef(file, hop.source);
+          root.appendChild(file);
+          return;
+        }
+        if (ui.node) {
+          const node = lookupNode(map, ui.node);
+          k('node', ui.node, 'mono');
+          if (node) {
+            k(
+              'state',
+              (node.used ? 'used' : 'idle') + (st(node) ? ' · ' + st(node) : '')
+            );
+          }
+          const files = filesForNode(map, ui.node);
+          if (files.length) {
+            const wrap = document.createElement('div');
+            files.forEach(function (f) {
+              const line = document.createElement('div');
+              appendFileRef(line, f);
+              wrap.appendChild(line);
+            });
+            k('files', wrap, 'mono');
+          }
+          const touching = hopsTouching(map, ui.node);
+          if (touching.length) {
+            k(
+              'hops in / out',
+              touching
+                .map(function (h) {
+                  return (
+                    String(h.n) +
+                    (h.from === ui.node ? ' out' : ' in') +
+                    ' · ' +
+                    h.type
+                  );
+                })
+                .join(', ')
+            );
+          }
+          return;
+        }
+        k(
+          'inspector',
+          map.query && map.query.mode === 'repo'
+            ? 'Select a box to see what lives there.'
+            : 'Select a step.'
+        );
+      }
+
+      function nodeEl(id) {
+        const nodes = document.querySelectorAll('[data-node]');
+        let exact = null;
+        for (let i = 0; i < nodes.length; i++) {
+          if (nodes[i].getAttribute('data-node') === id) {
+            if (nodes[i].classList.contains('layer')) return nodes[i];
+            if (nodes[i].classList.contains('box')) return nodes[i];
+            exact = nodes[i];
+          }
+        }
+        return exact;
+      }
+
+      function boxRect(el, stage, origin) {
+        const r = el.getBoundingClientRect();
+        return {
+          left: r.left - origin.left + stage.scrollLeft,
+          top: r.top - origin.top + stage.scrollTop,
+          width: r.width,
+          height: r.height,
+          cx: r.left - origin.left + stage.scrollLeft + r.width / 2,
+          cy: r.top - origin.top + stage.scrollTop + r.height / 2,
+        };
+      }
+
+      function boundaryPoint(from, to) {
+        const dx = to.cx - from.cx;
+        const dy = to.cy - from.cy;
+        if (dx === 0 && dy === 0) return { x: from.cx, y: from.cy };
+        const hw = from.width / 2;
+        const hh = from.height / 2;
+        const sx = dx === 0 ? Infinity : hw / Math.abs(dx);
+        const sy = dy === 0 ? Infinity : hh / Math.abs(dy);
+        const t = Math.min(sx, sy);
+        return { x: from.cx + dx * t, y: from.cy + dy * t };
+      }
+
+      function svgEl(name, attrs) {
+        const n = document.createElementNS('http://www.w3.org/2000/svg', name);
+        Object.keys(attrs).forEach(function (k) {
+          n.setAttribute(k, attrs[k]);
+        });
+        return n;
+      }
+
+      function paintOverlay(map) {
+        const svg = document.getElementById('hop-overlay');
+        const stage = document.getElementById('stage');
+        if (!svg || !stage) return;
+        const origin = stage.getBoundingClientRect();
+        const w = Math.max(stage.scrollWidth, 1);
+        const h = Math.max(stage.scrollHeight, 1);
+        svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+        svg.setAttribute('width', String(w));
+        svg.setAttribute('height', String(h));
+        while (svg.firstChild) svg.removeChild(svg.firstChild);
+        const hops = map.hops || [];
+        const touching =
+          !ui.hop && ui.node
+            ? hops.filter(function (hp) {
+                return hopShown(hp) && (hp.from === ui.node || hp.to === ui.node);
+              })
+            : [];
+        hops.forEach(function (hop) {
+          if (!hopShown(hop)) return;
+          const a = nodeEl(hop.from);
+          const b = nodeEl(hop.to);
+          if (!a || !b) return;
+          const ra = boxRect(a, stage, origin);
+          const rb = boxRect(b, stage, origin);
+          const p1 = boundaryPoint(ra, rb);
+          const p2 = boundaryPoint(rb, ra);
+          const selected = hop.n === ui.hop;
+          const related = touching.some(function (t) {
+            return t.n === hop.n;
+          });
+          const active = selected || related;
+          const color = pathColor(hop, selected, related);
+          if (selected) {
+            svg.appendChild(
+              svgEl('path', {
+                d: 'M ' + p1.x + ' ' + p1.y + ' L ' + p2.x + ' ' + p2.y,
+                fill: 'none',
+                stroke: PALETTE.white,
+                'stroke-width': '10',
+                opacity: '0.92',
+                'stroke-linecap': 'round',
+              })
+            );
+          }
+          const path = svgEl('path', {
+            d: 'M ' + p1.x + ' ' + p1.y + ' L ' + p2.x + ' ' + p2.y,
+            fill: 'none',
+            stroke: color,
+            'stroke-width': selected ? '4.5' : related ? '2.5' : '1.5',
+            opacity: selected ? '1' : related ? '0.7' : '0.18',
+            'stroke-linecap': 'round',
+            class: selected ? 'is-selected' : '',
+          });
+          svg.appendChild(path);
+          if (!active) return;
+          const mx = (p1.x + p2.x) / 2;
+          const my = (p1.y + p2.y) / 2;
+          svg.appendChild(
+            svgEl('circle', {
+              cx: String(mx),
+              cy: String(my),
+              r: '14',
+              fill: color,
+              stroke: PALETTE.white,
+              'stroke-width': '2',
+            })
+          );
+          const txt = svgEl('text', {
+            x: String(mx),
+            y: String(my + 5),
+            'text-anchor': 'middle',
+            'font-size': '13',
+            'font-weight': '800',
+            fill: PALETTE.white,
+          });
+          txt.textContent = String(hop.n);
+          svg.appendChild(txt);
+        });
+      }
+
+      function reducedMotion() {
+        return (
+          window.matchMedia &&
+          window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        );
+      }
+
+      function writeHash() {
+        let next = '';
+        if (ui.hop) next = '#hop=' + ui.hop;
+        else if (ui.node) next = '#node=' + encodeURIComponent(ui.node);
+        if (location.hash !== next) {
+          history.replaceState(
+            null,
+            '',
+            next || location.pathname + location.search
+          );
+        }
+      }
+
+      function applyHash(map) {
+        const hash = (location.hash || '').replace(/^#/, '');
+        if (hash.indexOf('hop=') === 0) {
+          const n = Number(hash.slice(4));
+          if (
+            (map.hops || []).some(function (h) {
+              return h.n === n;
+            })
+          ) {
+            ui.hop = n;
+            ui.node = '';
+            return;
+          }
+        }
+        if (hash.indexOf('node=') === 0) {
+          ui.node = decodeURIComponent(hash.slice(5));
+          ui.hop = 0;
+          return;
+        }
+        if ((map.hops || []).length) {
+          ui.hop = map.hops[0].n;
+          ui.node = '';
+        }
+      }
+
+      function applyFilter() {
+        if (mapRef && mapRef.query && mapRef.query.mode === 'pr') return;
+        const nodes = document.querySelectorAll('[data-node], [data-hop]');
+        nodes.forEach(function (node) {
+          const status = node.getAttribute('data-status') || '';
+          const unused = node.classList.contains('unused');
+          // unused is not existing-on-the-plan
+          const show = statusShown(status, unused);
+          node.classList.toggle('is-dim', !show);
+        });
+      }
+
+      function stopPlay() {
+        ui.playing = false;
+        if (playTimer) {
+          clearInterval(playTimer);
+          playTimer = 0;
+        }
+        const btn = document.getElementById('play-path');
+        if (btn) {
+          btn.setAttribute('aria-pressed', 'false');
+          btn.textContent = 'Play path';
+        }
+      }
+
+      function startPlay(map) {
+        const hops =
+          map.query && map.query.mode === 'pr'
+            ? prPathHops(map)
+            : map.hops || [];
+        if (!hops.length) return;
+        if (reducedMotion()) {
+          ui.hop = hops[hops.length - 1].n;
+          ui.node = '';
+          syncSelection(map);
+          return;
+        }
+        ui.playing = true;
+        const btn = document.getElementById('play-path');
+        if (btn) {
+          btn.setAttribute('aria-pressed', 'true');
+          btn.textContent = 'Pause';
+        }
+        const startAt = hops.findIndex(function (h) {
+          return h.n === ui.hop;
+        });
+        let i = startAt >= hops.length - 1 || startAt < 0 ? 0 : startAt;
+        ui.hop = hops[i].n;
+        ui.node = '';
+        syncSelection(map);
+        playTimer = setInterval(function () {
+          i += 1;
+          if (i >= hops.length) {
+            stopPlay();
+            return;
+          }
+          ui.hop = hops[i].n;
+          ui.node = '';
+          syncSelection(map);
+        }, 700);
+      }
+
+      function syncSelection(map) {
+        document.querySelectorAll('[data-node]').forEach(function (n) {
+          const id = n.getAttribute('data-node');
+          const hop = (map.hops || []).find(function (h) {
+            return h.n === ui.hop;
+          });
+          const on =
+            id === ui.node || (hop && (hop.from === id || hop.to === id));
+          n.setAttribute('data-selected', on ? '1' : '0');
+        });
+        document.querySelectorAll('.hop[data-hop]').forEach(function (n) {
+          n.setAttribute(
+            'aria-selected',
+            String(n.getAttribute('data-hop')) === String(ui.hop)
+              ? 'true'
+              : 'false'
+          );
+        });
+        document.querySelectorAll('.path-pill[data-hop]').forEach(function (n) {
+          n.setAttribute(
+            'aria-selected',
+            String(n.getAttribute('data-hop')) === String(ui.hop)
+              ? 'true'
+              : 'false'
+          );
+        });
+        paintInspector(map);
+        paintOverlay(map);
+        writeHash();
+        const selected = document.querySelector('.hop[aria-selected="true"]');
+        if (selected && selected.scrollIntoView) {
+          selected.scrollIntoView({ block: 'nearest' });
+        }
+      }
+
+      function selectHop(map, n) {
+        ui.hop = n;
+        ui.node = '';
+        syncSelection(map);
+      }
+
+      function bind(map) {
+        document.body.addEventListener('click', function (ev) {
+          const t = ev.target;
+          if (!t || !t.closest) return;
+          const copy = t.closest('[data-copy]');
+          if (copy) {
+            ev.preventDefault();
+            const path = copy.getAttribute('data-copy') || '';
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(path);
+            }
+            return;
+          }
+          if (t.closest('#play-path')) {
+            if (ui.playing) stopPlay();
+            else startPlay(map);
+            return;
+          }
+          const filter = t.closest('[data-filter]');
+          if (filter) {
+            ui.filter = filter.getAttribute('data-filter') || 'all';
+            document.querySelectorAll('[data-filter]').forEach(function (b) {
+              b.setAttribute(
+                'aria-pressed',
+                b.getAttribute('data-filter') === ui.filter ? 'true' : 'false'
+              );
+            });
+            if (map.query.mode === 'pr') {
+              paintHops(map);
+              paintPathStrip(map);
+              paintPrBar(map);
+            } else {
+              applyFilter();
+            }
+            const vis = visibleHops(map);
+            if (ui.hop && !vis.some(function (h) { return h.n === ui.hop; })) {
+              ui.hop = vis.length ? vis[0].n : 0;
+              ui.node = vis.length ? '' : ui.node;
+            }
+            syncSelection(map);
+            return;
+          }
+          const viewBtn = t.closest('[data-view]');
+          if (viewBtn) {
+            ui.view = viewBtn.getAttribute('data-view') || 'after';
+            document.querySelectorAll('[data-view]').forEach(function (b) {
+              b.setAttribute(
+                'aria-pressed',
+                b.getAttribute('data-view') === ui.view ? 'true' : 'false'
+              );
+            });
+            if (map.query.mode === 'pr') {
+              paintHops(map);
+              paintPathStrip(map);
+              paintPrBar(map);
+            } else {
+              applyFilter();
+            }
+            const vis = visibleHops(map);
+            if (ui.hop && !vis.some(function (h) { return h.n === ui.hop; })) {
+              ui.hop = vis.length ? vis[0].n : 0;
+              ui.node = vis.length ? '' : ui.node;
+            }
+            syncSelection(map);
+            return;
+          }
+          const finding = t.closest('[data-finding]');
+          if (finding) {
+            stopPlay();
+            const hopN = Number(finding.getAttribute('data-hop') || 0);
+            ui.hop = hopN || 0;
+            ui.node = finding.getAttribute('data-node') || '';
+            if (ui.hop) ui.node = '';
+            syncSelection(map);
+            return;
+          }
+          const hop = t.closest('[data-hop]');
+          if (hop && !t.closest('[data-finding]')) {
+            stopPlay();
+            selectHop(map, Number(hop.getAttribute('data-hop') || 0));
+            return;
+          }
+          const node = t.closest('[data-node]');
+          if (node) {
+            stopPlay();
+            ui.node = node.getAttribute('data-node') || '';
+            ui.hop = 0;
+            syncSelection(map);
+          }
+        });
+        document.body.addEventListener('keydown', function (ev) {
+          const hops = map.hops || [];
+          const focus =
+            ev.target && ev.target.closest
+              ? ev.target.closest('[data-node], .hop[data-hop], .path-pill')
+              : null;
+          if (focus && (ev.key === 'Enter' || ev.key === ' ')) {
+            const hopN = focus.getAttribute('data-hop');
+            if (hopN && !focus.getAttribute('data-node')) {
+              ev.preventDefault();
+              stopPlay();
+              selectHop(map, Number(hopN || 0));
+              return;
+            }
+            if (focus.getAttribute('data-node')) {
+              ev.preventDefault();
+              stopPlay();
+              ui.node = focus.getAttribute('data-node') || '';
+              ui.hop = 0;
+              syncSelection(map);
+              return;
+            }
+          }
+          if (!hops.length) return;
+          const vis = visibleHops(map);
+          if (ev.key === 'Escape') {
+            stopPlay();
+            ui.hop = 0;
+            ui.node = '';
+            syncSelection(map);
+            return;
+          }
+          if (ev.key === 'ArrowDown' || ev.key === 'j') {
+            ev.preventDefault();
+            stopPlay();
+            const cur = vis.findIndex(function (h) {
+              return h.n === ui.hop;
+            });
+            const next = vis[Math.min(vis.length - 1, cur + 1)] || vis[0];
+            if (next) selectHop(map, next.n);
+          }
+          if (ev.key === 'ArrowUp' || ev.key === 'k') {
+            ev.preventDefault();
+            stopPlay();
+            const cur = vis.findIndex(function (h) {
+              return h.n === ui.hop;
+            });
+            const prev =
+              vis[Math.max(0, (cur === -1 ? 1 : cur) - 1)] || vis[0];
+            if (prev) selectHop(map, prev.n);
+          }
+        });
+        window.addEventListener('hashchange', function () {
+          applyHash(map);
+          syncSelection(map);
+        });
+        if (window.ResizeObserver) {
+          const ro = new ResizeObserver(function () {
+            paintOverlay(map);
+          });
+          const stage = document.getElementById('stage');
+          if (stage) ro.observe(stage);
+        } else {
+          window.addEventListener('resize', function () {
+            paintOverlay(map);
+          });
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,234 @@
+{
+  "schemaVersion": 1,
+  "title": "Create order — from the form to an invoice",
+  "intent": "A signed-in customer places an order in the web app; the API stores it and billing raises an invoice without the customer waiting for it.",
+  "query": { "mode": "flow", "name": "create-order" },
+  "generatedAt": "2026-09-07T10:00:00Z",
+  "infra": [
+    { "id": "postgres", "used": true },
+    { "id": "redis", "used": false },
+    { "id": "rabbitmq", "used": true },
+    { "id": "adminer", "used": false }
+  ],
+  "processes": [
+    { "id": "api", "used": true },
+    { "id": "web", "used": true }
+  ],
+  "columns": [
+    {
+      "id": "web/src",
+      "kind": "routes",
+      "used": true,
+      "layers": [
+        {
+          "id": "web/src/routes",
+          "label": "routes",
+          "used": true,
+          "files": ["apps/web/src/routes/orders/new/+page.svelte"]
+        },
+        {
+          "id": "web/src/lib",
+          "label": "lib",
+          "used": true,
+          "files": ["apps/web/src/lib/api/orders.client.ts"]
+        }
+      ]
+    },
+    {
+      "id": "shared/src",
+      "kind": "library",
+      "used": true,
+      "layers": [
+        {
+          "id": "shared/src/order-schema",
+          "label": "order-schema",
+          "used": true,
+          "files": ["packages/shared/src/order-schema.ts"]
+        }
+      ]
+    },
+    {
+      "id": "api/orders",
+      "kind": "layered",
+      "used": true,
+      "layers": [
+        {
+          "id": "api/orders/domain",
+          "label": "domain",
+          "used": true,
+          "files": ["apps/api/src/features/orders/domain/order.ts"]
+        },
+        {
+          "id": "api/orders/application",
+          "label": "application",
+          "used": true,
+          "files": [
+            "apps/api/src/features/orders/application/create-order.use-case.ts",
+            "apps/api/src/features/orders/application/ports/order-repository.port.ts"
+          ]
+        },
+        {
+          "id": "api/orders/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "files": [
+            "apps/api/src/features/orders/infrastructure/http/orders.routes.ts",
+            "apps/api/src/features/orders/infrastructure/persistence/pg-order.repository.ts",
+            "apps/api/src/features/orders/infrastructure/messaging/outbox.relay.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "api/billing",
+      "kind": "layered",
+      "used": true,
+      "layers": [
+        {
+          "id": "api/billing/application",
+          "label": "application",
+          "used": true,
+          "files": ["apps/api/src/features/billing/application/charge-order.use-case.ts"]
+        },
+        {
+          "id": "api/billing/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "files": [
+            "apps/api/src/features/billing/infrastructure/messaging/order-created.consumer.ts",
+            "apps/api/src/features/billing/infrastructure/persistence/pg-invoice.repository.ts"
+          ]
+        }
+      ]
+    }
+  ],
+  "hops": [
+    {
+      "n": 1,
+      "from": "web/src/routes",
+      "to": "web/src/lib",
+      "type": "import",
+      "label": "submit → orders client",
+      "source": "apps/web/src/routes/orders/new/+page.svelte",
+      "work": "The new-order page collects one SKU and a quantity from the form and, on submit, hands them to the orders client. It shows the client's error next to the form if the call fails, otherwise it navigates to the created order.",
+      "in": "Form fields: SKU and quantity.",
+      "out": "One order line for the client to send.",
+      "fail": "Any error from the client is shown under the form; the page does not retry."
+    },
+    {
+      "n": 2,
+      "from": "web/src/lib",
+      "to": "api/orders/infrastructure",
+      "type": "HTTP",
+      "label": "POST /orders",
+      "source": "apps/web/src/lib/api/orders.client.ts",
+      "work": "Sends the order lines as JSON to the API, including the browser's session cookie, and returns the created order's id and total.",
+      "in": "Order lines from the page.",
+      "out": "The created order's id and total.",
+      "fail": "A non-2xx response is turned into an error carrying the API's message so the page can show it."
+    },
+    {
+      "n": 3,
+      "from": "api/orders/infrastructure",
+      "to": "shared/src/order-schema",
+      "type": "import",
+      "label": "orderInputSchema",
+      "source": "apps/api/src/features/orders/infrastructure/http/orders.routes.ts",
+      "work": "Checks the caller is signed in via the session cookie, then checks the body against the shared order schema — at least one line, positive quantities.",
+      "in": "The HTTP request: cookie plus JSON body.",
+      "out": "A validated customer id and order lines.",
+      "fail": "401 when there is no session; 400 when the body has no valid lines.",
+      "because": "The same schema is what the web client types its request against, so the wire shape lives in the shared package rather than being written twice."
+    },
+    {
+      "n": 4,
+      "from": "api/orders/infrastructure",
+      "to": "api/orders/application",
+      "type": "import",
+      "label": "create-order use case",
+      "source": "apps/api/src/features/orders/infrastructure/http/orders.routes.ts",
+      "work": "Passes the signed-in customer's id and the validated lines to the create-order use case and answers 201 with whatever it returns.",
+      "out": "201 with the order id and total."
+    },
+    {
+      "n": 5,
+      "from": "api/orders/application",
+      "to": "api/orders/domain",
+      "type": "import",
+      "label": "Order.create",
+      "source": "apps/api/src/features/orders/application/create-order.use-case.ts",
+      "work": "Builds an order with a fresh id. The order itself adds up the line totals and refuses to exist with no lines.",
+      "fail": "An order with no lines throws before anything is saved."
+    },
+    {
+      "n": 6,
+      "from": "api/orders/application",
+      "to": "postgres",
+      "type": "database",
+      "label": "INSERT orders, order_lines, outbox",
+      "source": "apps/api/src/features/orders/infrastructure/persistence/pg-order.repository.ts",
+      "work": "Writes the order, each of its lines, and an orders.created outbox row in one transaction.",
+      "fail": "If any insert fails the whole transaction rolls back and the error goes back to the route.",
+      "because": "Saving the order and announcing it in the same transaction means a crash in between cannot lose the event.",
+      "not": "Not a direct publish from the use case — the use case says nothing is published from there; the relay owns that."
+    },
+    {
+      "n": 7,
+      "from": "api/orders/infrastructure",
+      "to": "rabbitmq",
+      "type": "message bus",
+      "label": "relay publishes orders.created",
+      "source": "apps/api/src/features/orders/infrastructure/messaging/outbox.relay.ts",
+      "work": "Every second the relay reads unsent outbox rows, publishes each to the bus, and marks it sent.",
+      "out": "An orders.created message with the order id and total.",
+      "because": "Publishing is at-least-once, so the relay leaves duplicates to consumers to handle."
+    },
+    {
+      "n": 8,
+      "from": "rabbitmq",
+      "to": "api/billing/infrastructure",
+      "type": "message bus",
+      "label": "consume orders.created",
+      "source": "apps/api/src/features/billing/infrastructure/messaging/order-created.consumer.ts",
+      "work": "Listens for orders.created and reads the order id and total out of the message. The message is acknowledged only after the charge finishes, so a crash mid-way redelivers it.",
+      "in": "orders.created message: order id and total."
+    },
+    {
+      "n": 9,
+      "from": "api/billing/infrastructure",
+      "to": "api/billing/application",
+      "type": "import",
+      "label": "charge-order use case",
+      "source": "apps/api/src/features/billing/infrastructure/messaging/order-created.consumer.ts",
+      "work": "Hands the order id and amount to the charge-order use case, which does nothing if an invoice for that order already exists.",
+      "because": "The bus can deliver the same message twice, so the use case is written to be safe to repeat."
+    },
+    {
+      "n": 10,
+      "from": "api/billing/application",
+      "to": "postgres",
+      "type": "database",
+      "label": "INSERT invoices",
+      "source": "apps/api/src/features/billing/infrastructure/persistence/pg-invoice.repository.ts",
+      "work": "Checks for an existing invoice for the order, then stores a new open invoice with the amount due.",
+      "out": "An open invoice row for the order."
+    }
+  ],
+  "grounding": [
+    { "id": "compose", "path": "infra/compose.yaml" },
+    { "id": "web-page", "path": "apps/web/src/routes/orders/new/+page.svelte" },
+    { "id": "web-client", "path": "apps/web/src/lib/api/orders.client.ts" },
+    { "id": "schema", "path": "packages/shared/src/order-schema.ts" },
+    { "id": "route", "path": "apps/api/src/features/orders/infrastructure/http/orders.routes.ts" },
+    { "id": "use-case", "path": "apps/api/src/features/orders/application/create-order.use-case.ts" },
+    { "id": "order", "path": "apps/api/src/features/orders/domain/order.ts" },
+    { "id": "repository", "path": "apps/api/src/features/orders/infrastructure/persistence/pg-order.repository.ts" },
+    { "id": "relay", "path": "apps/api/src/features/orders/infrastructure/messaging/outbox.relay.ts" },
+    { "id": "consumer", "path": "apps/api/src/features/billing/infrastructure/messaging/order-created.consumer.ts" },
+    { "id": "charge", "path": "apps/api/src/features/billing/application/charge-order.use-case.ts" },
+    { "id": "invoices", "path": "apps/api/src/features/billing/infrastructure/persistence/pg-invoice.repository.ts" }
+  ],
+  "unknown": [
+    "apps/web/src/lib/api/orders.client.ts sends unitPrice 0 from the page; where the real price comes from was not opened."
+  ]
+}

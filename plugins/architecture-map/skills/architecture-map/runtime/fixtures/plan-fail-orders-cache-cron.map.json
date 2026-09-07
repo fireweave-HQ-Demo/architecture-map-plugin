@@ -1,0 +1,168 @@
+{
+  "schemaVersion": 1,
+  "title": "Plan: cache order totals and bill from a nightly job",
+  "intent": "The plan caches each order's total in redis on create and adds a new reports process whose nightly job charges yesterday's orders. The cache is new work; the nightly charge collides with billing that already runs on the bus.",
+  "query": { "mode": "plan", "name": "orders-cache-and-nightly-billing" },
+  "generatedAt": "2026-09-07T10:00:00Z",
+  "verdict": "fail",
+  "questions": [],
+  "findings": [
+    {
+      "id": "double-billing",
+      "severity": "conflict",
+      "title": "Nightly charge duplicates the existing bus consumer",
+      "detail": "apps/api/src/features/billing/infrastructure/messaging/order-created.consumer.ts already charges every order the moment orders.created arrives. A nightly job that charges yesterday's orders would invoice each order twice. Either drop the job or retire the consumer — the plan keeps both.",
+      "hop": 5
+    },
+    {
+      "id": "reports-new-process",
+      "severity": "proposed",
+      "title": "reports is a new process",
+      "detail": "No apps/reports and no reports service in infra/compose.yaml. It needs a Dockerfile, a compose entry, and a scheduler — none exist yet.",
+      "nodeId": "reports"
+    },
+    {
+      "id": "redis-first-use",
+      "severity": "proposed",
+      "title": "First code to use redis",
+      "detail": "redis is already in infra/compose.yaml but nothing reads it. The cache write is the first client; a Redis URL must reach the api container.",
+      "nodeId": "redis"
+    }
+  ],
+  "infra": [
+    { "id": "postgres", "used": true, "status": "existing" },
+    { "id": "redis", "used": true, "status": "existing" },
+    { "id": "rabbitmq", "used": true, "status": "existing" },
+    { "id": "adminer", "used": false }
+  ],
+  "processes": [
+    { "id": "api", "used": true, "status": "existing" },
+    { "id": "web", "used": false },
+    { "id": "reports", "used": true, "status": "proposed", "label": "reports (new)" }
+  ],
+  "columns": [
+    {
+      "id": "api/orders",
+      "kind": "layered",
+      "used": true,
+      "status": "existing",
+      "layers": [
+        {
+          "id": "api/orders/application",
+          "label": "application",
+          "used": true,
+          "status": "existing",
+          "files": ["apps/api/src/features/orders/application/create-order.use-case.ts"]
+        },
+        {
+          "id": "api/orders/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "status": "existing",
+          "files": [
+            "apps/api/src/features/orders/infrastructure/persistence/pg-order.repository.ts",
+            "apps/api/src/features/orders/infrastructure/messaging/outbox.relay.ts"
+          ]
+        },
+        {
+          "id": "api/orders/cache",
+          "label": "cache adapter (new)",
+          "used": true,
+          "status": "proposed",
+          "files": []
+        }
+      ]
+    },
+    {
+      "id": "api/billing",
+      "kind": "layered",
+      "used": true,
+      "status": "existing",
+      "layers": [
+        {
+          "id": "api/billing/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "status": "existing",
+          "files": ["apps/api/src/features/billing/infrastructure/messaging/order-created.consumer.ts"]
+        }
+      ]
+    },
+    {
+      "id": "reports/nightly",
+      "kind": "unknown",
+      "used": true,
+      "status": "proposed",
+      "label": "reports / nightly (new)",
+      "layers": [
+        {
+          "id": "reports/nightly/job",
+          "label": "job",
+          "used": true,
+          "status": "proposed",
+          "files": []
+        }
+      ]
+    }
+  ],
+  "hops": [
+    {
+      "n": 1,
+      "from": "api/orders/application",
+      "to": "postgres",
+      "type": "database",
+      "label": "INSERT orders, order_lines, outbox",
+      "source": "apps/api/src/features/orders/infrastructure/persistence/pg-order.repository.ts",
+      "status": "existing",
+      "work": "Writes the order, its lines, and an orders.created outbox row in one transaction. Unchanged by the plan."
+    },
+    {
+      "n": 2,
+      "from": "api/orders/application",
+      "to": "api/orders/cache",
+      "type": "import",
+      "label": "cache adapter (planned)",
+      "source": "apps/api/src/features/orders/application/create-order.use-case.ts",
+      "status": "proposed",
+      "work": "The plan has the use case call a new cache adapter after the save. The use case today saves and returns; there is no such call."
+    },
+    {
+      "n": 3,
+      "from": "api/orders/cache",
+      "to": "redis",
+      "type": "cache",
+      "label": "SET order:{id}:total (planned)",
+      "source": "infra/compose.yaml",
+      "status": "proposed",
+      "work": "Stores the order total under the order id. redis exists in compose; the adapter and its client do not exist yet."
+    },
+    {
+      "n": 4,
+      "from": "reports/nightly/job",
+      "to": "postgres",
+      "type": "cron",
+      "label": "nightly SELECT yesterday's orders (planned)",
+      "source": "infra/compose.yaml",
+      "status": "proposed",
+      "work": "A new process wakes nightly and reads yesterday's orders. No scheduler, process, or compose entry exists for it."
+    },
+    {
+      "n": 5,
+      "from": "reports/nightly/job",
+      "to": "api/billing/infrastructure",
+      "type": "HTTP",
+      "label": "POST /charges for each order (planned)",
+      "source": "apps/api/src/features/billing/infrastructure/messaging/order-created.consumer.ts",
+      "status": "conflict",
+      "work": "The plan has the job ask billing to charge each order. Billing already charges every order from the bus the moment it is created, so this charges twice.",
+      "not": "Not an alternative to the consumer — the plan does not remove the consumer, it adds a second path to the same invoice table."
+    }
+  ],
+  "grounding": [
+    { "id": "compose", "path": "infra/compose.yaml" },
+    { "id": "use-case", "path": "apps/api/src/features/orders/application/create-order.use-case.ts" },
+    { "id": "repository", "path": "apps/api/src/features/orders/infrastructure/persistence/pg-order.repository.ts" },
+    { "id": "consumer", "path": "apps/api/src/features/billing/infrastructure/messaging/order-created.consumer.ts" }
+  ],
+  "unknown": []
+}

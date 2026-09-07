@@ -1,0 +1,8 @@
+{
+  "name": "@sample-shop/api",
+  "private": true,
+  "main": "src/main.ts",
+  "dependencies": {
+    "@sample-shop/shared": "workspace:*"
+  }
+}

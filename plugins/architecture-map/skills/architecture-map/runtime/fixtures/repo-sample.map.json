@@ -1,0 +1,241 @@
+{
+  "schemaVersion": 1,
+  "title": "sample-shop — repository surface",
+  "intent": "Everything that runs and where code lives, read from infra/compose.yaml and 3 manifests. No path is traced here; use the flow command for that.",
+  "query": {
+    "mode": "repo",
+    "name": "sample-shop"
+  },
+  "generatedAt": "2026-09-07T10:00:00Z",
+  "infra": [
+    {
+      "id": "postgres",
+      "used": true,
+      "label": "postgres (postgres:16-alpine)"
+    },
+    {
+      "id": "redis",
+      "used": true,
+      "label": "redis (redis:7-alpine)"
+    },
+    {
+      "id": "rabbitmq",
+      "used": true,
+      "label": "rabbitmq (rabbitmq:3-management)"
+    },
+    {
+      "id": "adminer",
+      "used": true,
+      "label": "adminer (adminer:4)"
+    }
+  ],
+  "processes": [
+    {
+      "id": "api",
+      "used": true,
+      "label": "api — apps/api"
+    },
+    {
+      "id": "web",
+      "used": true,
+      "label": "web — apps/web"
+    }
+  ],
+  "columns": [
+    {
+      "id": "api/billing",
+      "kind": "layered",
+      "used": true,
+      "label": "api / billing",
+      "layers": [
+        {
+          "id": "api/billing/application",
+          "label": "application",
+          "used": true,
+          "files": [
+            "apps/api/src/features/billing/application/charge-order.use-case.ts"
+          ]
+        },
+        {
+          "id": "api/billing/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "files": [
+            "apps/api/src/features/billing/infrastructure/messaging/order-created.consumer.ts",
+            "apps/api/src/features/billing/infrastructure/persistence/pg-invoice.repository.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "api/orders",
+      "kind": "layered",
+      "used": true,
+      "label": "api / orders",
+      "layers": [
+        {
+          "id": "api/orders/application",
+          "label": "application",
+          "used": true,
+          "files": [
+            "apps/api/src/features/orders/application/create-order.use-case.ts",
+            "apps/api/src/features/orders/application/ports/order-repository.port.ts"
+          ]
+        },
+        {
+          "id": "api/orders/domain",
+          "label": "domain",
+          "used": true,
+          "files": [
+            "apps/api/src/features/orders/domain/order.ts"
+          ]
+        },
+        {
+          "id": "api/orders/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "files": [
+            "apps/api/src/features/orders/infrastructure/http/orders.routes.ts",
+            "apps/api/src/features/orders/infrastructure/messaging/amqp.ts",
+            "apps/api/src/features/orders/infrastructure/messaging/order-created.publisher.ts",
+            "apps/api/src/features/orders/infrastructure/messaging/outbox.relay.ts",
+            "apps/api/src/features/orders/infrastructure/persistence/pg-order.repository.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "api/shared",
+      "kind": "library",
+      "used": true,
+      "label": "api / shared",
+      "layers": [
+        {
+          "id": "api/shared/auth",
+          "label": "auth",
+          "used": true,
+          "files": [
+            "apps/api/src/shared/auth/require-user.middleware.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "web/src",
+      "kind": "routes",
+      "used": true,
+      "label": "web",
+      "layers": [
+        {
+          "id": "web/src/lib",
+          "label": "lib",
+          "used": true,
+          "files": [
+            "apps/web/src/lib/api/orders.client.ts"
+          ]
+        },
+        {
+          "id": "web/src/routes",
+          "label": "routes",
+          "used": true,
+          "files": [
+            "apps/web/src/routes/+layout.svelte",
+            "apps/web/src/routes/orders/new/+page.svelte"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shared/src",
+      "kind": "library",
+      "used": true,
+      "label": "shared",
+      "layers": [
+        {
+          "id": "shared/src/files",
+          "label": "files",
+          "used": true,
+          "files": [
+            "packages/shared/src/index.ts",
+            "packages/shared/src/order-schema.ts"
+          ]
+        }
+      ]
+    }
+  ],
+  "hops": [],
+  "findings": [
+    {
+      "id": "api-billing-layers",
+      "severity": "info",
+      "title": "billing has application and infrastructure but no domain layer",
+      "detail": "apps/api/src/features/billing contains application, infrastructure; domain is not on disk. That may be intended — this is the shape, not a grade.",
+      "nodeId": "api/billing"
+    },
+    {
+      "id": "redis-unreferenced",
+      "severity": "info",
+      "title": "redis runs in compose but no source file names it",
+      "detail": "Neither the service id nor its container name appears in any code or config file outside compose. It may be reached through a URL in the environment, or it may be unused.",
+      "nodeId": "redis"
+    },
+    {
+      "id": "adminer-unreferenced",
+      "severity": "info",
+      "title": "adminer runs in compose but no source file names it",
+      "detail": "Neither the service id nor its container name appears in any code or config file outside compose. It may be reached through a URL in the environment, or it may be unused.",
+      "nodeId": "adminer"
+    },
+    {
+      "id": "adminer-operator",
+      "severity": "info",
+      "title": "adminer is a database UI for people, not part of any product path",
+      "detail": "infra/compose.yaml exposes it on a host port and nothing depends on it. It stays on the map because it runs.",
+      "nodeId": "adminer"
+    },
+    {
+      "id": "publisher-superseded",
+      "severity": "info",
+      "title": "order-created.publisher.ts says it is superseded by the outbox relay",
+      "detail": "Both files exist. The publisher's own comment says it is kept for a release that still calls it; nothing in main.ts calls it.",
+      "nodeId": "api/orders/infrastructure"
+    }
+  ],
+  "grounding": [
+    {
+      "id": "compose",
+      "path": "infra/compose.yaml"
+    },
+    {
+      "id": "workspace",
+      "path": "package.json"
+    },
+    {
+      "id": "api-manifest",
+      "path": "apps/api/package.json"
+    },
+    {
+      "id": "api-dockerfile",
+      "path": "apps/api/Dockerfile"
+    },
+    {
+      "id": "web-manifest",
+      "path": "apps/web/package.json"
+    },
+    {
+      "id": "web-dockerfile",
+      "path": "apps/web/Dockerfile"
+    },
+    {
+      "id": "shared-manifest",
+      "path": "packages/shared/package.json"
+    },
+    {
+      "id": "api-entry",
+      "path": "apps/api/src/main.ts"
+    }
+  ],
+  "unknown": [
+    "apps/web has no server code in the tree that was opened; whether it calls the API from the browser only or also server-side was not checked."
+  ]
+}

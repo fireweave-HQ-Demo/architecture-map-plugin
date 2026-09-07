@@ -1,0 +1,22 @@
+{
+  "name": "architecture-map",
+  "version": "1.0.0",
+  "description": "Accurate, interactive architecture maps of any repository: the whole surface (init), one traced flow, an unimplemented plan graded against disk, or a pull request as before/after of the same path. JSON contract, locked HTML shell, offline Bun runtime. Never guesses — asks.",
+  "author": {
+    "name": "Architecture Map contributors"
+  },
+  "homepage": "https://github.com/fireweave-HQ-Demo/architecture-map-plugin",
+  "repository": "https://github.com/fireweave-HQ-Demo/architecture-map-plugin",
+  "license": "MIT",
+  "keywords": [
+    "architecture",
+    "diagram",
+    "code-map",
+    "flow",
+    "pull-request",
+    "plan-review",
+    "documentation"
+  ],
+  "skills": "./skills/",
+  "commands": "./commands/"
+}

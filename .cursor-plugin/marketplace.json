@@ -1,0 +1,14 @@
+{
+  "name": "architecture-map",
+  "description": "Interactive, code-grounded architecture maps for any repository: surface, flows, plan review, PR before/after.",
+  "owner": {
+    "name": "Architecture Map contributors"
+  },
+  "plugins": [
+    {
+      "name": "architecture-map",
+      "source": "./plugins/architecture-map",
+      "description": "Accurate, interactive architecture maps of any repository: the whole surface (init), one traced flow, an unimplemented plan graded against disk, or a pull request as before/after of the same path."
+    }
+  ]
+}

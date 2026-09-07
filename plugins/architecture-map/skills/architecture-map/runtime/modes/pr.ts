@@ -5,7 +5,7 @@
  * classifies the overlay so nobody hand-labels unchanged/added/removed/changed.
  */
 
-import type { MapHop, PrStatus } from './schema';
+import type { MapHop, PrStatus } from '../schema';
 
 /** A hop as traced at one ref: no `n`, no `status`, no `beforeWork`. */
 export type PrTraceHop = Omit<MapHop, 'n' | 'status' | 'beforeWork'>;

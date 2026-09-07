@@ -10,7 +10,7 @@ description: >-
   questions instead of guessing. Not for authoring designs or writing docs.
 metadata:
   author: Architecture Map contributors
-  version: 1.1.0
+  version: 1.2.0
 ---
 
 # Architecture map
@@ -35,10 +35,10 @@ and stop — do not hand-write HTML instead.
 | `RUNTIME/inventory.ts` | Mechanical read of compose stacks, code units, feature folders |
 | `RUNTIME/ignore.ts` | Directory names skipped while walking a repository |
 | `RUNTIME/gitignore.ts` | Appends `.architecture-map/` to the repo `.gitignore` on `init` |
-| `RUNTIME/repo.ts` | Drafts the `repo` map from the inventory (what `init` writes) |
-| `RUNTIME/plan.ts` | `membershipOf` + `mechanicalPlanIssues`: statuses disk can contradict |
-| `RUNTIME/pr.ts` | `mergePrHops(before, after)` → unchanged / added / removed / changed |
-| `RUNTIME/render.ts` · `shell.html` | JSON → interactive HTML. The shell is locked. |
+| `RUNTIME/modes/repo.ts` | Drafts the `repo` map from the inventory (what `init` writes) |
+| `RUNTIME/modes/plan.ts` | `membershipOf` + `mechanicalPlanIssues`: statuses disk can contradict |
+| `RUNTIME/modes/pr.ts` | `mergePrHops(before, after)` → unchanged / added / removed / changed |
+| `RUNTIME/render/inject.ts` · `render/shell.html` | JSON → interactive HTML. The shell is locked. |
 | `RUNTIME/fixtures/*.map.json` | Golden maps for every mode, traced from `tests/fixtures/sample-repo` |
 | `references/map-contract.md` | Field-by-field contract with the plain-language rules |
 | `references/discovery-protocol.md` | Where to look for each band and each edge |

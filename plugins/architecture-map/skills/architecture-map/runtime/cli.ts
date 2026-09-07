@@ -28,10 +28,10 @@ import {
   ensureArchitectureMapGitignored,
 } from './gitignore';
 import { buildInventory, type Inventory } from './inventory';
-import { mechanicalPlanIssues } from './plan';
-import { mergePrHops, type PrTraceHop } from './pr';
-import { injectMap, loadShell } from './render';
-import { draftRepoMap } from './repo';
+import { mechanicalPlanIssues } from './modes/plan';
+import { mergePrHops, type PrTraceHop } from './modes/pr';
+import { draftRepoMap } from './modes/repo';
+import { injectMap, loadShell } from './render/inject';
 import {
   parseMapDocument,
   validateMapDocument,

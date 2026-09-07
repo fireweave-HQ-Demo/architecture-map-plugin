@@ -5,7 +5,7 @@ import {
   hopSeam,
   mergePrHops,
   type PrTraceHop,
-} from '../plugins/architecture-map/skills/architecture-map/runtime/pr';
+} from '../plugins/architecture-map/skills/architecture-map/runtime/modes/pr';
 import type { MapDocument } from '../plugins/architecture-map/skills/architecture-map/runtime/schema';
 import { loadFixture } from './helpers';
 

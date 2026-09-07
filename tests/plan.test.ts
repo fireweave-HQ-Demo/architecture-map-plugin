@@ -5,7 +5,7 @@ import {
   inventoryAllowsStatus,
   mechanicalPlanIssues,
   membershipOf,
-} from '../plugins/architecture-map/skills/architecture-map/runtime/plan';
+} from '../plugins/architecture-map/skills/architecture-map/runtime/modes/plan';
 import type { MapDocument } from '../plugins/architecture-map/skills/architecture-map/runtime/schema';
 import { SAMPLE_REPO, clone, loadFixture } from './helpers';
 

@@ -13,8 +13,8 @@
 import { readdirSync, readFileSync, statSync, type Dirent } from 'node:fs';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 
-import { IGNORED_DIRS } from './ignore';
-import type { ComposeService, FeatureRecord, Inventory, UnitRecord } from './inventory';
+import { IGNORED_DIRS } from '../ignore';
+import type { ComposeService, FeatureRecord, Inventory, UnitRecord } from '../inventory';
 import {
   MAX_LAYER_FILES,
   SCHEMA_VERSION,
@@ -24,7 +24,7 @@ import {
   type MapGrounding,
   type MapLayer,
   type MapNodeUse,
-} from './schema';
+} from '../schema';
 
 export interface DraftRepoOptions {
   /** Display name; defaults to the root manifest name, then the directory name. */

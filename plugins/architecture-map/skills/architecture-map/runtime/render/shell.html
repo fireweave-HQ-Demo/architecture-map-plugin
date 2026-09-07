@@ -1025,14 +1025,17 @@
         'spawn',
         'UNKNOWN',
       ];
-      const DEFAULT_PREVIEW = 'fixtures/flow-create-order.map.json';
+      // Paths are relative to this file (runtime/render/shell.html); fixtures
+      // live one level up at runtime/fixtures/. Only used when the shell is
+      // opened without an injected map, for local preview via ?map=.
+      const DEFAULT_PREVIEW = '../fixtures/flow-create-order.map.json';
       const PREVIEW_MAPS = [
-        'fixtures/repo-sample.map.json',
-        'fixtures/flow-create-order.map.json',
-        'fixtures/plan-blocked-missing-entry.map.json',
-        'fixtures/plan-fail-orders-cache-cron.map.json',
-        'fixtures/pr-blocked-missing-flow.map.json',
-        'fixtures/pr-create-order-outbox.map.json',
+        '../fixtures/repo-sample.map.json',
+        '../fixtures/flow-create-order.map.json',
+        '../fixtures/plan-blocked-missing-entry.map.json',
+        '../fixtures/plan-fail-orders-cache-cron.map.json',
+        '../fixtures/pr-blocked-missing-flow.map.json',
+        '../fixtures/pr-create-order-outbox.map.json',
       ];
       const el = document.getElementById('map-data');
       const raw = (el && el.textContent) || '';
@@ -1091,7 +1094,7 @@
           'This URL is the locked shell, not a rendered map. A static file server serves the placeholder, not injected JSON. Open a rendered HTML, or pass ?map= to a .map.json file.';
         const pre = document.createElement('p');
         const code = document.createElement('code');
-        code.textContent = 'shell.html?map=fixtures/flow-create-order.map.json';
+        code.textContent = 'render/shell.html?map=fixtures/flow-create-order.map.json';
         pre.appendChild(code);
         const p2 = document.createElement('p');
         p2.textContent =

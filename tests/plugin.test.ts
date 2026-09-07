@@ -213,21 +213,28 @@ describe('portability', () => {
   });
 
   test('the runtime imports only itself and node builtins', () => {
+    // Relative-only ('./' or '../') keeps the runtime self-contained; no
+    // package imports means the skill folder is drop-in portable to any
+    // agent that reads SKILL.md.
     for (const f of files.filter((p) => p.startsWith(RUNTIME_DIR) && p.endsWith('.ts'))) {
       const text = readFileSync(f, 'utf8');
       for (const m of text.matchAll(/from '([^']+)'/g)) {
         const spec = m[1];
-        expect(spec.startsWith('./') || spec.startsWith('node:'), `${relative(PLUGIN_DIR, f)} imports ${spec}`).toBe(true);
+        const isLocal = spec.startsWith('./') || spec.startsWith('../');
+        expect(isLocal || spec.startsWith('node:'), `${relative(PLUGIN_DIR, f)} imports ${spec}`).toBe(true);
       }
     }
   });
 
   test('inventory and repo share one ignored-directory list', () => {
+    // IGNORED_DIRS is the walker's skip-list. Anyone who walks the repo
+    // must go through this one file so a new noisy directory only has to
+    // be added once.
     expect(existsSync(join(RUNTIME_DIR, 'ignore.ts'))).toBe(true);
     const inventory = readFileSync(join(RUNTIME_DIR, 'inventory.ts'), 'utf8');
-    const repo = readFileSync(join(RUNTIME_DIR, 'repo.ts'), 'utf8');
+    const repo = readFileSync(join(RUNTIME_DIR, 'modes/repo.ts'), 'utf8');
     expect(inventory).toContain("from './ignore'");
-    expect(repo).toContain("from './ignore'");
+    expect(repo).toContain("from '../ignore'");
     expect(inventory).not.toMatch(/const IGNORED_DIRS = new Set/);
     expect(repo).not.toMatch(/const IGNORED_DIRS = new Set/);
   });

@@ -6,8 +6,8 @@
  * Nothing here knows a service or framework by name.
  */
 
-import type { Inventory } from './inventory';
-import type { MapDocument, MapValidationIssue, PlanStatus } from './schema';
+import type { Inventory } from '../inventory';
+import type { MapDocument, MapValidationIssue, PlanStatus } from '../schema';
 
 export type MembershipKind =
   | 'infra'

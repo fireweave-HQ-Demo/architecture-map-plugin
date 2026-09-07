@@ -5,7 +5,7 @@
 
 import { resolve } from 'node:path';
 
-import type { MapDocument } from './schema';
+import type { MapDocument } from '../schema';
 
 export const SHELL_MARKER = '__MAP_JSON__';
 export const SHELL_FINGERPRINT = '--accent: #4f46e5';

@@ -7,7 +7,7 @@ import { buildInventory } from '../plugins/architecture-map/skills/architecture-
 import {
   draftRepoMap,
   MAX_LAYERS_PER_COLUMN,
-} from '../plugins/architecture-map/skills/architecture-map/runtime/repo';
+} from '../plugins/architecture-map/skills/architecture-map/runtime/modes/repo';
 import {
   parseMapDocument,
   validateMapDocument,

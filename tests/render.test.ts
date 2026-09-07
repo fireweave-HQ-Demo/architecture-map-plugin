@@ -9,7 +9,7 @@ import {
   injectMap,
   loadShell,
   shellPath,
-} from '../plugins/architecture-map/skills/architecture-map/runtime/render';
+} from '../plugins/architecture-map/skills/architecture-map/runtime/render/inject';
 import { parseMapDocument } from '../plugins/architecture-map/skills/architecture-map/runtime/schema';
 import { RUNTIME_DIR, fixtureNames, loadAllFixtures, loadFixture } from './helpers';
 
@@ -17,8 +17,8 @@ const shell = await loadShell();
 const flow = parseMapDocument(await loadFixture('flow-create-order.map.json'));
 
 describe('locked shell', () => {
-  test('ships next to the runtime with its markers intact', () => {
-    expect(shellPath()).toBe(resolve(RUNTIME_DIR, 'shell.html'));
+  test('ships next to the renderer with its markers intact', () => {
+    expect(shellPath()).toBe(resolve(RUNTIME_DIR, 'render/shell.html'));
     expect(shell.split(SHELL_MARKER).length - 1).toBe(1);
     expect(shell).toContain(SHELL_FINGERPRINT);
     expect(shell).toContain(SHELL_DATA_ATTR);
@@ -55,10 +55,11 @@ describe('locked shell', () => {
   });
 
   test('bundled preview list matches the fixtures on disk', () => {
+    // Paths are relative to render/shell.html, so fixtures/ is one level up.
     const block = /const PREVIEW_MAPS = \[([\s\S]*?)\];/.exec(shell)?.[1] ?? '';
-    const listed = [...block.matchAll(/'fixtures\/([^']+)'/g)].map((m) => m[1]).sort();
+    const listed = [...block.matchAll(/'\.\.\/fixtures\/([^']+)'/g)].map((m) => m[1]).sort();
     expect(listed).toEqual(fixtureNames());
-    const def = /const DEFAULT_PREVIEW = 'fixtures\/([^']+)'/.exec(shell)?.[1];
+    const def = /const DEFAULT_PREVIEW = '\.\.\/fixtures\/([^']+)'/.exec(shell)?.[1];
     expect(fixtureNames()).toContain(def!);
   });
 

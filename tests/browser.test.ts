@@ -8,7 +8,7 @@
 import { afterEach, describe, expect, test } from 'bun:test';
 import { Window } from 'happy-dom';
 
-import { injectMap, loadShell } from '../plugins/architecture-map/skills/architecture-map/runtime/render';
+import { injectMap, loadShell } from '../plugins/architecture-map/skills/architecture-map/runtime/render/inject';
 import {
   parseMapDocument,
   type MapDocument,

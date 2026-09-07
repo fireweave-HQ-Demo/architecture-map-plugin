@@ -38,7 +38,7 @@ describe('vocabulary', () => {
   });
 
   test('shell legend vocabulary mirrors TOUCH_TYPES', async () => {
-    const shell = await Bun.file(resolve(RUNTIME_DIR, 'shell.html')).text();
+    const shell = await Bun.file(resolve(RUNTIME_DIR, 'render/shell.html')).text();
     const block = /const TOUCH_TYPE_NAMES = \[([\s\S]*?)\];/.exec(shell);
     expect(block).not.toBeNull();
     const names = [...block![1].matchAll(/'([^']+)'/g)].map((m) => m[1]);

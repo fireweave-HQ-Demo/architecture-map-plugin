@@ -33,6 +33,7 @@ and stop — do not hand-write HTML instead.
 | `RUNTIME/cli.ts` | `init` · `inventory` · `validate` · `render` · `merge-pr` · `fixtures` |
 | `RUNTIME/schema.ts` | The map contract: closed vocabularies, caps, per-mode rules |
 | `RUNTIME/inventory.ts` | Mechanical read of compose stacks, code units, feature folders |
+| `RUNTIME/ignore.ts` | Directory names skipped while walking a repository |
 | `RUNTIME/repo.ts` | Drafts the `repo` map from the inventory (what `init` writes) |
 | `RUNTIME/plan.ts` | `membershipOf` + `mechanicalPlanIssues`: statuses disk can contradict |
 | `RUNTIME/pr.ts` | `mergePrHops(before, after)` → unchanged / added / removed / changed |

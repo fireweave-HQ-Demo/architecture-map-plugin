@@ -16,3 +16,5 @@ First public release.
 - Locked interactive HTML shell: path strip, Play path, inspector step
   brief, status filters, PR views, deep links, reduced-motion support.
 - Commands: `arch-init`, `arch-flow`, `arch-plan`, `arch-pr`.
+- Packaging: CI on every push, shared walk-ignore list, Bun `engines`,
+  contributing guide, Cursor install parity with Claude Code.

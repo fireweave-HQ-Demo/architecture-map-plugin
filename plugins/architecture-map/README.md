@@ -28,8 +28,15 @@ On Claude Code the commands are namespaced: `/architecture-map:arch-init` and so
 /plugin install architecture-map@architecture-map
 ```
 
-**Cursor** — add the marketplace repository in Settings → Plugins, or point a
-local plugin at `plugins/architecture-map`.
+**Cursor**
+
+```
+/plugin marketplace add fireweave-HQ-Demo/architecture-map-plugin
+/plugin install architecture-map@architecture-map
+```
+
+Or Settings → Plugins → add this repository, then install `architecture-map`.
+For local hacking, point a local plugin at `plugins/architecture-map`.
 
 **Any other agent** — copy `plugins/architecture-map/skills/architecture-map/`
 into the agent's skills directory; `SKILL.md` and `runtime/` are
@@ -95,7 +102,7 @@ plugins/architecture-map/
   skills/architecture-map/
     SKILL.md                     the procedure the agent follows
     references/                  contract, discovery, ask protocol, visual grammar, examples
-    runtime/                     cli.ts, schema.ts, inventory.ts, repo.ts, plan.ts, pr.ts, render.ts, shell.html
+    runtime/                     cli · schema · inventory · repo · plan · pr · render · ignore · shell
     runtime/fixtures/            golden maps for every mode
 ```
 

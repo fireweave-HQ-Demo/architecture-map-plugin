@@ -9,23 +9,34 @@ Cursor, and any agent that reads `SKILL.md` skills.
 
 ## Install from this marketplace
 
-Claude Code:
+**Claude Code**
 
 ```
 /plugin marketplace add fireweave-HQ-Demo/architecture-map-plugin
 /plugin install architecture-map@architecture-map
 ```
 
-Cursor: add this repository as a plugin marketplace (Settings → Plugins), or
-install `plugins/architecture-map` as a local plugin.
+**Cursor**
+
+```
+/plugin marketplace add fireweave-HQ-Demo/architecture-map-plugin
+/plugin install architecture-map@architecture-map
+```
+
+Or: Settings → Plugins → add
+`https://github.com/fireweave-HQ-Demo/architecture-map-plugin`, then install
+`architecture-map`. For local hacking, point a local plugin at
+`plugins/architecture-map`.
 
 The plugin needs [Bun](https://bun.sh) ≥ 1.1 on the machine that runs the agent.
 
 ## Develop
 
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ```
 bun install          # dev dependencies only (typescript, happy-dom)
-bun run check        # typecheck + tests
+bun run check        # typecheck + tests (also runs in CI on every push)
 bun run fixtures     # render every golden map to runtime/fixtures/rendered/
 ```
 
@@ -37,7 +48,8 @@ boots the rendered HTML in happy-dom and drives it like a user would.
 
 1. Bump `version` in both `plugins/architecture-map/.claude-plugin/plugin.json`
    and `plugins/architecture-map/.cursor-plugin/plugin.json` (the hygiene test
-   keeps them equal) and add a `CHANGELOG.md` entry.
+   keeps them equal), the skill `metadata.version`, root `package.json`, and
+   add a `CHANGELOG.md` entry.
 2. `bun run check`.
 3. Tag `architecture-map-v<version>` and push. Marketplace consumers pin the
    tag or the commit.

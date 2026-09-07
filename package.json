@@ -4,6 +4,9 @@
   "private": true,
   "description": "Marketplace repository for the architecture-map plugin: repo surface, feature flows, plan review, and PR before/after as interactive HTML.",
   "type": "module",
+  "engines": {
+    "bun": ">=1.1.0"
+  },
   "scripts": {
     "test": "bun test ./tests",
     "typecheck": "bunx tsc -p tsconfig.json --noEmit",

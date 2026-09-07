@@ -13,6 +13,7 @@
 import { readdirSync, readFileSync, statSync, type Dirent } from 'node:fs';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 
+import { IGNORED_DIRS } from './ignore';
 import type { ComposeService, FeatureRecord, Inventory, UnitRecord } from './inventory';
 import {
   MAX_LAYER_FILES,
@@ -34,25 +35,6 @@ export interface DraftRepoOptions {
 
 /** Layers drawn per column before the rest is folded into a finding. */
 export const MAX_LAYERS_PER_COLUMN = 10;
-
-const IGNORED_DIRS = new Set([
-  'node_modules',
-  '.git',
-  'dist',
-  'build',
-  'out',
-  'target',
-  'vendor',
-  'coverage',
-  '.next',
-  '.nuxt',
-  '.svelte-kit',
-  '.turbo',
-  '.cache',
-  '.venv',
-  'venv',
-  '__pycache__',
-]);
 
 const FEATURE_CONTAINERS = new Set(['features', 'modules']);
 const SOURCE_ROOTS = ['src', 'lib', 'app', 'internal', 'cmd', 'pkg'];

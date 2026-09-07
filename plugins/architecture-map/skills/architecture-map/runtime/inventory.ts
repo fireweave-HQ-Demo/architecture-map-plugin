@@ -11,6 +11,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 
+import { IGNORED_DIRS } from './ignore';
 import type { ColumnKind } from './schema';
 
 export const INVENTORY_SCHEMA_VERSION = 1;
@@ -92,25 +93,6 @@ export interface Inventory {
   features: FeatureRecord[];
   findings: string[];
 }
-
-const IGNORED_DIRS = new Set([
-  'node_modules',
-  '.git',
-  'dist',
-  'build',
-  'out',
-  'target',
-  'vendor',
-  'coverage',
-  '.next',
-  '.nuxt',
-  '.svelte-kit',
-  '.turbo',
-  '.cache',
-  '.venv',
-  'venv',
-  '__pycache__',
-]);
 
 const MANIFESTS = [
   'package.json',

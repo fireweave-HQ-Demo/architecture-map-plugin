@@ -90,6 +90,23 @@ describe('plugin manifests', () => {
     const changelog = readFileSync(join(PLUGIN_DIR, 'CHANGELOG.md'), 'utf8');
     expect(changelog).toContain(`## ${claude.version}`);
   });
+
+  test('root package, skill metadata, and plugin manifests share one version', () => {
+    const root = readJson(join(REPO_ROOT, 'package.json'));
+    const skillMd = readFileSync(join(SKILL_DIR, 'SKILL.md'), 'utf8');
+    const skillVersion = /^  version:\s*(.+)$/m.exec(skillMd)?.[1]?.trim();
+    expect(String(root.version)).toBe(String(claude.version));
+    expect(skillVersion).toBe(String(claude.version));
+    const engines = root.engines as { bun?: string } | undefined;
+    expect(engines?.bun).toMatch(/^>=/);
+  });
+
+  test('CI workflow runs bun check on push and pull_request', () => {
+    const ci = readFileSync(join(REPO_ROOT, '.github/workflows/ci.yml'), 'utf8');
+    expect(ci).toContain('bun run check');
+    expect(ci).toContain('oven-sh/setup-bun');
+    expect(ci).toMatch(/pull_request/);
+  });
 });
 
 describe('skill', () => {
@@ -191,6 +208,16 @@ describe('portability', () => {
         expect(spec.startsWith('./') || spec.startsWith('node:'), `${relative(PLUGIN_DIR, f)} imports ${spec}`).toBe(true);
       }
     }
+  });
+
+  test('inventory and repo share one ignored-directory list', () => {
+    expect(existsSync(join(RUNTIME_DIR, 'ignore.ts'))).toBe(true);
+    const inventory = readFileSync(join(RUNTIME_DIR, 'inventory.ts'), 'utf8');
+    const repo = readFileSync(join(RUNTIME_DIR, 'repo.ts'), 'utf8');
+    expect(inventory).toContain("from './ignore'");
+    expect(repo).toContain("from './ignore'");
+    expect(inventory).not.toMatch(/const IGNORED_DIRS = new Set/);
+    expect(repo).not.toMatch(/const IGNORED_DIRS = new Set/);
   });
 
   test('no test files, lockfiles or rendered output ship inside the plugin', () => {

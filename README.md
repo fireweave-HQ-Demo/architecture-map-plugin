@@ -9,26 +9,30 @@ Cursor, and any agent that reads `SKILL.md` skills.
 
 ## Install from this marketplace
 
-**Claude Code**
-
-```
-/plugin marketplace add fireweave-HQ-Demo/architecture-map-plugin
-/plugin install architecture-map@architecture-map
-```
-
-**Cursor**
-
-```
-/plugin marketplace add fireweave-HQ-Demo/architecture-map-plugin
-/plugin install architecture-map@architecture-map
-```
-
-Or: Settings → Plugins → add
-`https://github.com/fireweave-HQ-Demo/architecture-map-plugin`, then install
-`architecture-map`. For local hacking, point a local plugin at
-`plugins/architecture-map`.
-
 The plugin needs [Bun](https://bun.sh) ≥ 1.1 on the machine that runs the agent.
+
+**Claude Code** — slash commands are the supported path:
+
+```
+/plugin marketplace add fireweave-HQ-Demo/architecture-map-plugin
+/plugin install architecture-map@architecture-map
+/reload-plugins
+```
+
+That is `plugin-name@marketplace-name` from `.claude-plugin/marketplace.json`
+(`architecture-map` / `architecture-map`).
+
+**Cursor** — use the IDE Plugins UI (this is the documented path):
+
+1. Open **Settings → Plugins** (or **Customize** in the sidebar).
+2. Add / import marketplace
+   `https://github.com/fireweave-HQ-Demo/architecture-map-plugin`.
+3. Install `architecture-map`, then reload the window if skills do not appear.
+
+Agent or Cursor CLI sessions may also accept the Claude-style
+`/plugin marketplace add` / `/plugin install` lines; prefer Settings for
+a durable IDE install. For local hacking, symlink or copy
+`plugins/architecture-map` into `~/.cursor/plugins/local/`.
 
 ## Skills
 

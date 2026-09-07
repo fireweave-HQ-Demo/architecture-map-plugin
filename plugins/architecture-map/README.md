@@ -51,22 +51,20 @@ default base is `origin/main`.
 
 ## Install
 
-**Claude Code**
+**Claude Code** — slash commands are the supported path:
 
 ```
 /plugin marketplace add fireweave-HQ-Demo/architecture-map-plugin
 /plugin install architecture-map@architecture-map
+/reload-plugins
 ```
 
-**Cursor**
-
-```
-/plugin marketplace add fireweave-HQ-Demo/architecture-map-plugin
-/plugin install architecture-map@architecture-map
-```
-
-Or Settings → Plugins → add this repository, then install `architecture-map`.
-For local hacking, point a local plugin at `plugins/architecture-map`.
+**Cursor** — Settings → Plugins (or Customize) → add
+`https://github.com/fireweave-HQ-Demo/architecture-map-plugin`, then
+install `architecture-map` and reload if needed. Agent/CLI may use the
+same `/plugin …` lines as Claude Code; Settings is the reliable IDE
+install. For local hacking, put this directory under
+`~/.cursor/plugins/local/`.
 
 **Any other agent** — copy `plugins/architecture-map/skills/architecture-map/`
 into the agent's skills directory; `SKILL.md` and `runtime/` are

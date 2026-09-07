@@ -16,5 +16,5 @@
     "noUnusedParameters": true
   },
   "include": ["plugins/**/*.ts", "tests/*.ts"],
-  "exclude": ["node_modules", "tests/sample-repo"]
+  "exclude": ["node_modules", "tests/fixtures"]
 }

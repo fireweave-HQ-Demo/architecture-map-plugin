@@ -1,7 +1,7 @@
 # Examples
 
 Golden maps under `runtime/fixtures/` were traced by hand from
-`tests/sample-repo` (a small shop: a `web` app, an `api` with `orders` and
+`tests/fixtures/sample-repo` (a small shop: a `web` app, an `api` with `orders` and
 `billing` features, a `shared` package, and a compose stack with Postgres,
 RabbitMQ, Redis and Adminer). They are the bar for every mode. Open them
 before your first map in a new repository; render them with

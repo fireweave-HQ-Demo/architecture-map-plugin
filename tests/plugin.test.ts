@@ -107,6 +107,18 @@ describe('plugin manifests', () => {
     expect(ci).toContain('oven-sh/setup-bun');
     expect(ci).toMatch(/pull_request/);
   });
+
+  test('the manifest-sync tool exists and bun run check invokes it', () => {
+    // The Cursor manifests are derived from the Claude ones; the sync tool
+    // is what enforces that. If either the script or the wiring disappears,
+    // the two hosts can silently drift.
+    expect(existsSync(join(REPO_ROOT, 'tools/sync-manifests.ts'))).toBe(true);
+    const pkg = readJson(join(REPO_ROOT, 'package.json'));
+    const scripts = pkg.scripts as Record<string, string>;
+    expect(scripts.sync).toBe('bun tools/sync-manifests.ts');
+    expect(scripts['sync:check']).toBe('bun tools/sync-manifests.ts --check');
+    expect(scripts.check).toContain('sync:check');
+  });
 });
 
 describe('skill', () => {

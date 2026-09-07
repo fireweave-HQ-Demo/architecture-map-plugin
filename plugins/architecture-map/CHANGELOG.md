@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.1.0
+
+Repository-shape and tooling changes; the runtime, contract and rendered
+output are unchanged from `1.0.1`.
+
+- **`tools/sync-manifests.ts`** projects the Cursor `plugin.json` and
+  `marketplace.json` from the Claude Code manifests, so the two hosts can
+  never drift out of sync. `bun run sync` writes; `bun run sync:check`
+  fails on drift and is part of `bun run check` and CI.
+- `tests/sample-repo/` moved to `tests/fixtures/sample-repo/` so the
+  directory name names the role it plays.
+
 ## 1.0.1
 
 - `init` appends `.architecture-map/` to the repository `.gitignore` when

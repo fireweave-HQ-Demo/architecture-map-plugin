@@ -75,22 +75,31 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ```
 bun install          # dev dependencies only (typescript, happy-dom)
-bun run check        # typecheck + tests (also runs in CI on every push)
+bun run check        # manifest-sync check + typecheck + tests (also CI on push)
+bun run sync         # regenerate Cursor manifests from the Claude Code ones
 bun run fixtures     # render every golden map to runtime/fixtures/rendered/
 ```
 
-Tests live in `tests/` and run against `tests/sample-repo`, a small
+Tests live in `tests/` and run against `tests/fixtures/sample-repo`, a small
 e-commerce monorepo that the golden maps were traced from. The browser suite
 boots the rendered HTML in happy-dom and drives it like a user would.
 
+The **Claude Code manifests are the source of truth** for both hosts.
+`plugins/architecture-map/.claude-plugin/plugin.json` and
+`.claude-plugin/marketplace.json` are hand-edited; their Cursor
+counterparts are projected from them by
+[`tools/sync-manifests.ts`](tools/sync-manifests.ts). CI runs
+`bun run sync:check`, so drift is caught before merge.
+
 ## Release
 
-1. Bump `version` in both `plugins/architecture-map/.claude-plugin/plugin.json`
-   and `plugins/architecture-map/.cursor-plugin/plugin.json` (the hygiene test
-   keeps them equal), the skill `metadata.version`, root `package.json`, and
-   add a `CHANGELOG.md` entry.
-2. `bun run check`.
-3. Tag `architecture-map-v<version>` and push. Marketplace consumers pin the
+1. Edit **only** the Claude Code manifests
+   (`plugins/architecture-map/.claude-plugin/plugin.json` and
+   `.claude-plugin/marketplace.json`), the skill `metadata.version`, root
+   `package.json`, and add a `CHANGELOG.md` entry.
+2. `bun run sync` to update the Cursor manifests.
+3. `bun run check`.
+4. Tag `architecture-map-v<version>` and push. Marketplace consumers pin the
    tag or the commit.
 
 ## License

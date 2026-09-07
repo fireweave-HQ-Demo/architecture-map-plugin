@@ -8,7 +8,7 @@ export const PLUGIN_DIR = resolve(REPO_ROOT, 'plugins/architecture-map');
 export const SKILL_DIR = resolve(PLUGIN_DIR, 'skills/architecture-map');
 export const RUNTIME_DIR = resolve(SKILL_DIR, 'runtime');
 export const FIXTURES_DIR = resolve(RUNTIME_DIR, 'fixtures');
-export const SAMPLE_REPO = resolve(import.meta.dir, 'sample-repo');
+export const SAMPLE_REPO = resolve(import.meta.dir, 'fixtures/sample-repo');
 export const CLI = resolve(RUNTIME_DIR, 'cli.ts');
 
 export function fixtureNames(): string[] {

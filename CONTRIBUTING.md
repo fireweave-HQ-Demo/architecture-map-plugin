@@ -9,7 +9,7 @@ bun run fixtures  # regenerate rendered goldens (gitignored)
 ```
 
 The installable plugin lives under `plugins/architecture-map/`. Tests and
-`tests/sample-repo/` stay outside the plugin so strangers never download them.
+`tests/fixtures/sample-repo/` stay outside the plugin so strangers never download them.
 
 ## Layout rules
 

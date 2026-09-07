@@ -3,16 +3,46 @@
 Accurate, interactive architecture maps of any repository, drawn from what is
 on disk — never from docs, memory, or a PR description.
 
-Four commands, one document shape, one locked HTML shell:
+One skill, four commands, one document shape, one locked HTML shell.
+On Claude Code the commands are namespaced: `/architecture-map:arch-init`
+and so on.
 
-| Command | Mode | You get |
-| --- | --- | --- |
-| `/arch-init` | `repo` | The whole surface: every compose service, code unit and feature, as boxes with their files. Mechanically drafted — nothing invented. |
-| `/arch-flow <name>` | `flow` | One path through the code, ≤ 12 hops, each backed by the file that proves it, with a plain-language brief per step. |
-| `/arch-plan` | `plan` | An unimplemented plan graded against disk: `existing` / `proposed` / `conflict`, a verdict, findings. Asks instead of guessing. |
-| `/arch-pr <n> <flow>` | `pr` | The same path at the base and head refs, merged into `unchanged` / `added` / `removed` / `changed`, with **On this PR** / **Before this PR** views. |
+## Skill
 
-On Claude Code the commands are namespaced: `/architecture-map:arch-init` and so on.
+**`architecture-map`** — the procedure the agent follows. Use when the
+user asks for an architecture map, a flow or sequence of a feature, a
+review of a plan against the codebase, or what a PR changes on a path.
+It fills a JSON `MapDocument`; `shell.html` renders it. Every node comes
+from inventory or a file opened this turn; every hop names the file that
+proves it. Missing facts become numbered questions — never a guessed
+diagram. Not for authoring designs or writing docs.
+
+## Commands
+
+**`/arch-init`** (`repo`) — the whole surface: every compose service,
+code unit and feature as boxes with their files. Drafted mechanically
+from inventory; nothing invented; no hops. Run this first, or after the
+layout changed. Optional `--name <title>`, `--compose <file>` (pick a
+stack when several exist), `--out-dir` (default `.architecture-map/`).
+
+**`/arch-flow <name>`** (`flow`) — how this path runs today. Trace from
+the entry (route, page, CLI, consumer, cron) through the code, ≤ 12
+hops, each backed by a file you opened, with a plain-language brief per
+step. Name the flow. Longer paths split at a real seam (queue, process
+boundary) into two maps.
+
+**`/arch-plan [plan]`** (`plan`) — does this unimplemented plan fit what
+is on disk? Paste a plan or give a file path. Every planned node is
+`existing` / `proposed` / `conflict`; the map carries a verdict
+(`pass` / `pass-with-new-work` / `fail` / `blocked`) and findings.
+Unknown entry actor, feature, or trigger → questions and stop. Grades a
+plan; it does not write a replacement design.
+
+**`/arch-pr [n] <flow>`** (`pr`) — what this PR changes on **one** path.
+The same flow at the base ref and at the head, merged into `unchanged` /
+`added` / `removed` / `changed`, with **On this PR** / **Before this PR**
+views. One HTML, never two files. Default head is the working tree;
+default base is `origin/main`.
 
 ## Requirements
 

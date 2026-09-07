@@ -30,6 +30,41 @@ Or: Settings → Plugins → add
 
 The plugin needs [Bun](https://bun.sh) ≥ 1.1 on the machine that runs the agent.
 
+## Skills
+
+The plugin ships **one skill** and **four commands**. The skill is the
+procedure; the commands pick a mode.
+
+**`architecture-map`** (skill) — draw what actually runs. Use when the
+user asks for an architecture map, a flow of a feature, a review of a
+plan against disk, or what a PR changes on a path. Agents fill JSON; a
+locked HTML shell renders it. Asks numbered questions instead of
+guessing. Not for authoring designs or writing docs.
+
+**`/arch-init`** — repository surface (`repo` mode). Every compose
+service, code unit and feature as boxes with their files. Mechanically
+drafted from inventory; no hops. Optional `--name`, `--compose <file>`,
+`--out-dir`.
+
+**`/arch-flow <name>`** — one path today (`flow` mode). Entry to infra,
+≤ 12 hops, each backed by a file the agent opened, with a
+plain-language brief per step.
+
+**`/arch-plan [plan]`** — unimplemented plan vs disk (`plan` mode).
+Nodes tagged `existing` / `proposed` / `conflict`, plus a verdict and
+findings. Missing facts → `blocked` and questions. Does not write a
+replacement design.
+
+**`/arch-pr [n] <flow>`** — one path before/after a PR (`pr` mode).
+Merged hops: `unchanged` / `added` / `removed` / `changed`. One HTML
+with **On this PR** / **Before this PR** views.
+
+On Claude Code the commands are namespaced:
+`/architecture-map:arch-init` and so on. Output lands in
+`<repo>/.architecture-map/`. See
+[`plugins/architecture-map/README.md`](plugins/architecture-map/README.md)
+for the file layout and honesty rules.
+
 ## Develop
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).

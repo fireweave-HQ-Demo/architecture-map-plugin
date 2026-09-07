@@ -21,8 +21,11 @@ describe('cli', () => {
   });
 
   test('init writes inventory, a valid repo map and its HTML into the out dir', async () => {
+    const { cpSync } = await import('node:fs');
+    const root = join(tmp, 'init-named');
+    cpSync(SAMPLE_REPO, root, { recursive: true });
     const out = join(tmp, 'init-out');
-    const res = await runCli(['init', '--root', SAMPLE_REPO, '--out-dir', out, '--name', 'Shop']);
+    const res = await runCli(['init', '--root', root, '--out-dir', out, '--name', 'Shop']);
     expect(res.code).toBe(0);
     for (const f of ['inventory.json', 'repo.map.json', 'repo.html']) {
       expect(existsSync(join(out, f)), f).toBe(true);
@@ -36,8 +39,10 @@ describe('cli', () => {
     expect(check.code).toBe(0);
     const html = await Bun.file(join(out, 'repo.html')).text();
     expect(html).toContain('data-shell="architecture-map-interactive"');
-    expect(html).toContain(`data-repo-root="${SAMPLE_REPO}"`);
+    expect(html).toContain(`data-repo-root="${root}"`);
     expect(html).toContain('Shop — repository surface');
+    expect(res.stdout).toContain('gitignore: added .architecture-map/');
+    expect(await Bun.file(join(root, '.gitignore')).text()).toBe('.architecture-map/\n');
   });
 
   test('init defaults its out dir to <root>/.architecture-map and honours --compose', async () => {
@@ -56,6 +61,38 @@ describe('cli', () => {
     expect(prod.code).toBe(0);
     const prodMap = JSON.parse(await Bun.file(join(root, '.architecture-map/repo.map.json')).text());
     expect(prodMap.infra.map((n: { id: string }) => n.id)).toEqual(['edge']);
+    const gitignore = await Bun.file(join(root, '.gitignore')).text();
+    expect(gitignore.split('\n').filter((l) => l === '.architecture-map/')).toHaveLength(1);
+  });
+
+  test('init creates or appends .gitignore and does not duplicate the ignore line', async () => {
+    const { cpSync, writeFileSync } = await import('node:fs');
+    const root = join(tmp, 'init-gitignore');
+    cpSync(SAMPLE_REPO, root, { recursive: true });
+    writeFileSync(join(root, '.gitignore'), 'node_modules\n');
+    const first = await runCli(['init', '--root', root]);
+    expect(first.code).toBe(0);
+    expect(first.stdout).toContain('gitignore: added .architecture-map/');
+    expect(await Bun.file(join(root, '.gitignore')).text()).toBe(
+      'node_modules\n.architecture-map/\n'
+    );
+    const second = await runCli(['init', '--root', root]);
+    expect(second.code).toBe(0);
+    expect(second.stdout).not.toContain('gitignore: added');
+    expect(await Bun.file(join(root, '.gitignore')).text()).toBe(
+      'node_modules\n.architecture-map/\n'
+    );
+  });
+
+  test('init treats an existing .architecture-map spelling as already ignored', async () => {
+    const { cpSync, writeFileSync } = await import('node:fs');
+    const root = join(tmp, 'init-gitignore-equiv');
+    cpSync(SAMPLE_REPO, root, { recursive: true });
+    writeFileSync(join(root, '.gitignore'), '.architecture-map\n');
+    const res = await runCli(['init', '--root', root]);
+    expect(res.code).toBe(0);
+    expect(res.stdout).not.toContain('gitignore: added');
+    expect(await Bun.file(join(root, '.gitignore')).text()).toBe('.architecture-map\n');
   });
 
   test('inventory writes a versioned JSON document', async () => {

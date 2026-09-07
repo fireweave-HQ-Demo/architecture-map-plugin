@@ -72,8 +72,8 @@ self-contained.
 
 ## What it writes
 
-Everything lands in `<repo>/.architecture-map/` (add it to `.gitignore` if
-you do not want generated files committed):
+Everything lands in `<repo>/.architecture-map/`. `init` adds that path to
+`.gitignore` when it is not already ignored:
 
 ```
 .architecture-map/
@@ -130,7 +130,7 @@ plugins/architecture-map/
   skills/architecture-map/
     SKILL.md                     the procedure the agent follows
     references/                  contract, discovery, ask protocol, visual grammar, examples
-    runtime/                     cli · schema · inventory · repo · plan · pr · render · ignore · shell
+    runtime/                     cli · schema · inventory · repo · plan · pr · render · ignore · gitignore · shell
     runtime/fixtures/            golden maps for every mode
 ```
 

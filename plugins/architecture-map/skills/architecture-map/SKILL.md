@@ -10,7 +10,7 @@ description: >-
   questions instead of guessing. Not for authoring designs or writing docs.
 metadata:
   author: Architecture Map contributors
-  version: 1.0.0
+  version: 1.0.1
 ---
 
 # Architecture map
@@ -34,6 +34,7 @@ and stop — do not hand-write HTML instead.
 | `RUNTIME/schema.ts` | The map contract: closed vocabularies, caps, per-mode rules |
 | `RUNTIME/inventory.ts` | Mechanical read of compose stacks, code units, feature folders |
 | `RUNTIME/ignore.ts` | Directory names skipped while walking a repository |
+| `RUNTIME/gitignore.ts` | Appends `.architecture-map/` to the repo `.gitignore` on `init` |
 | `RUNTIME/repo.ts` | Drafts the `repo` map from the inventory (what `init` writes) |
 | `RUNTIME/plan.ts` | `membershipOf` + `mechanicalPlanIssues`: statuses disk can contradict |
 | `RUNTIME/pr.ts` | `mergePrHops(before, after)` → unchanged / added / removed / changed |
@@ -48,8 +49,8 @@ and stop — do not hand-write HTML instead.
 Output lives in `<repo>/.architecture-map/` unless the user names another
 place: `inventory.json`, `repo.map.json` + `repo.html`,
 `flow-<slug>.map.json` + `.html`, `plan-<slug>…`, `pr-<n>-<slug>…`.
-Suggest adding that directory to `.gitignore` if the user does not want
-generated files committed; do not edit `.gitignore` unasked.
+`init` appends `.architecture-map/` to the repository `.gitignore` when
+that path is not already ignored.
 
 ## Modes
 

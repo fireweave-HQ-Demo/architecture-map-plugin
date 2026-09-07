@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.1
+
+- `init` appends `.architecture-map/` to the repository `.gitignore` when
+  that path is not already ignored, so generated maps stay untracked.
+
 ## 1.0.0
 
 First public release.

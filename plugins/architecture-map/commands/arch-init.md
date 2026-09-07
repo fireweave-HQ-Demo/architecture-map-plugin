@@ -23,8 +23,9 @@ Arguments: `$ARGUMENTS` — optional `--name <title>`, one or more
    bun RUNTIME/cli.ts init --root . $ARGUMENTS
    ```
 
-   It writes `inventory.json`, `repo.map.json` and `repo.html`, and prints a
-   one-line surface count.
+   It writes `inventory.json`, `repo.map.json` and `repo.html`, appends
+   `.architecture-map/` to `.gitignore` when that path is not already
+   ignored, and prints a one-line surface count.
 3. Read `repo.map.json` and `inventory.json`. If `findings` say other compose
    stacks exist and the user's question is about one of them, ask which,
    then re-run with `--compose <file>`.

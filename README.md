@@ -65,7 +65,7 @@ with **On this PR** / **Before this PR** views.
 
 On Claude Code the commands are namespaced:
 `/architecture-map:arch-init` and so on. Output lands in
-`<repo>/.architecture-map/`. See
+`<repo>/.architecture-map/`; `init` gitignores that folder. See
 [`plugins/architecture-map/README.md`](plugins/architecture-map/README.md)
 for the file layout and honesty rules.
 

@@ -10,8 +10,10 @@
  *   bun cli.ts fixtures  [--out-dir <dir>]        render every bundled golden map
  *
  * `init` writes inventory.json, repo.map.json and repo.html into --out-dir
- * (default <root>/.architecture-map). The repo map is drafted mechanically
- * from the inventory; every box and file on it exists on disk.
+ * (default <root>/.architecture-map) and appends `.architecture-map/` to
+ * the repository `.gitignore` when that path is not already ignored. The
+ * repo map is drafted mechanically from the inventory; every box and file
+ * on it exists on disk.
  *
  * Exit codes: 0 ok · 1 the map or inventory is not valid · 2 usage error.
  * Everything is deterministic and offline; no network, no model calls.
@@ -20,6 +22,11 @@
 import { mkdir, readdir } from 'node:fs/promises';
 import { basename, dirname, join, resolve } from 'node:path';
 
+import {
+  ARCHITECTURE_MAP_DIR,
+  ARCHITECTURE_MAP_GITIGNORE,
+  ensureArchitectureMapGitignored,
+} from './gitignore';
 import { buildInventory, type Inventory } from './inventory';
 import { mechanicalPlanIssues } from './plan';
 import { mergePrHops, type PrTraceHop } from './pr';
@@ -33,7 +40,7 @@ import {
 } from './schema';
 
 /** Where `init` writes, relative to the repository root. */
-export const DEFAULT_OUT_DIR = '.architecture-map';
+export const DEFAULT_OUT_DIR = ARCHITECTURE_MAP_DIR;
 
 const USAGE = `architecture-map runtime
 
@@ -46,8 +53,10 @@ Usage:
   bun cli.ts fixtures  [--out-dir <dir>]
 
 init writes <out-dir>/inventory.json, repo.map.json and repo.html
-(out-dir defaults to <root>/${DEFAULT_OUT_DIR}). When the repository has
-several compose stacks the dev/local one is chosen; --compose overrides.
+(out-dir defaults to <root>/${DEFAULT_OUT_DIR}) and adds
+${ARCHITECTURE_MAP_GITIGNORE} to <root>/.gitignore if missing. When the
+repository has several compose stacks the dev/local one is chosen;
+--compose overrides.
 
 Exit codes: 0 ok, 1 invalid map/inventory, 2 usage.
 `;
@@ -147,7 +156,13 @@ async function cmdInit(argv: string[]): Promise<number> {
     await writeOut(join(outDir, 'repo.map.json'), JSON.stringify(map, null, 2) + '\n'),
     await writeOut(join(outDir, 'repo.html'), injectMap(shell, map, { repoRoot: root })),
   ];
+  const gitignore = await ensureArchitectureMapGitignored(root);
   process.stdout.write(wrote.join('\n') + '\n');
+  if (gitignore === 'added') {
+    process.stdout.write(
+      `gitignore: added ${ARCHITECTURE_MAP_GITIGNORE} to ${join(root, '.gitignore')}\n`
+    );
+  }
   process.stdout.write(
     `surface: ${map.infra.length} infra · ${map.processes.length} processes · ${map.columns.length} columns · ${
       (map.findings ?? []).length

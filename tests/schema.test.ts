@@ -191,6 +191,41 @@ describe('repo mode', () => {
     expect(issues).toContain('compare: compare belongs to pr mode only');
     expect(issues.some((i) => i.startsWith('questions:'))).toBe(true);
   });
+
+  test('repoStats: optional but validated when present, and only on repo mode', () => {
+    // Absent → still valid (the shell falls back to counting from arrays).
+    const stripped = clone(repo) as unknown as Record<string, unknown>;
+    delete stripped.repoStats;
+    expect(issuesOf(stripped)).toEqual([]);
+    // Present on the golden must be non-negative integers.
+    expect(repo.repoStats).toBeDefined();
+    expect(repo.repoStats!.units).toBeGreaterThan(0);
+    expect(repo.repoStats!.processes).toBe(repo.processes.length);
+    // Wrong field type is rejected.
+    const bad = clone(repo) as unknown as Record<string, unknown>;
+    (bad.repoStats as Record<string, unknown>).units = -1;
+    expect(issuesOf(bad)).toContain('repoStats.units: must be a non-negative integer');
+    // Present on a non-repo mode is rejected.
+    const wrongMode = clone(flow) as unknown as Record<string, unknown>;
+    wrongMode.repoStats = { units: 1, features: 0, layers: 0, files: 0, infra: 0, processes: 0 };
+    expect(issuesOf(wrongMode)).toContain('repoStats: repoStats belongs to repo mode only');
+  });
+
+  test('column.fileCount: optional non-negative integer on any column', () => {
+    for (const col of repo.columns) {
+      expect(typeof col.fileCount).toBe('number');
+      expect(col.fileCount!).toBeGreaterThanOrEqual(0);
+      expect(Number.isInteger(col.fileCount)).toBe(true);
+    }
+    // Sum matches repoStats.files — the drafter computes both from the
+    // same walk, so drift here means one branch lied.
+    const summed = repo.columns.reduce((n, c) => n + (c.fileCount ?? 0), 0);
+    expect(summed).toBe(repo.repoStats!.files);
+    // A non-integer or negative value is rejected.
+    const bad = clone(repo);
+    (bad.columns[0] as { fileCount?: unknown }).fileCount = 1.5;
+    expect(issuesOf(bad)).toContain('columns[0].fileCount: must be a non-negative integer when present');
+  });
 });
 
 describe('flow mode', () => {

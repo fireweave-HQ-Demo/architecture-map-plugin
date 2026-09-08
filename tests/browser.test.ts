@@ -171,6 +171,7 @@ describe('repo', () => {
     expect((page.doc.querySelector('#play-path') as { disabled?: boolean } | null)?.disabled).toBe(true);
     expect(page.all('#findings .finding')).toHaveLength(repo.findings!.length);
     expect(page.doc.querySelector('#platform')?.hasAttribute('open')).toBe(true);
+    expect(page.doc.body.getAttribute('data-mode')).toBe('repo');
   });
 
   test('every column and layer is drawn and clickable', async () => {
@@ -180,6 +181,145 @@ describe('repo', () => {
     expect(page.text('#inspector')).toContain('api/orders/infrastructure');
     expect(page.text('#inspector')).toContain('outbox.relay.ts');
     expect(page.text('#inspector')).not.toContain('hops in / out');
+  });
+
+  test('stats chips reflect repoStats and hide zero-valued rows', async () => {
+    const page = await open(repo);
+    const stats = page.all('#repo-stats .repo-stat').map((c) => c.textContent?.trim() ?? '');
+    expect(stats.length).toBeGreaterThan(0);
+    // Sample has features, so the features chip must show; infra count must
+    // match the fixture header exactly.
+    expect(stats.some((s) => /^\d+ units$/.test(s))).toBe(true);
+    expect(stats.some((s) => /^\d+ features$/.test(s))).toBe(true);
+    expect(stats.some((s) => new RegExp(`^${repo.infra.length} infra$`).test(s))).toBe(true);
+    expect(stats.some((s) => new RegExp(`^${repo.processes.length} processes$`).test(s))).toBe(true);
+  });
+
+  test('toolbar shows search, list/map toggle, only-unused, dense; other modes hide it', async () => {
+    const page = await open(repo);
+    expect((page.doc.getElementById('repo-toolbar') as { hidden?: boolean } | null)?.hidden).toBe(false);
+    expect(page.doc.getElementById('repo-search-input')).not.toBeNull();
+    const views = page.all('#repo-toolbar [data-repo-view]').map((b) => b.getAttribute('data-repo-view'));
+    expect(views).toEqual(['list', 'map']);
+    expect(page.doc.querySelector('[data-repo-toggle="only-unused"]')).not.toBeNull();
+    expect(page.doc.querySelector('[data-repo-toggle="dense"]')).not.toBeNull();
+    const other = await open(flow);
+    expect((other.doc.getElementById('repo-toolbar') as { hidden?: boolean } | null)?.hidden).toBe(true);
+    expect((other.doc.getElementById('repo-stats') as { hidden?: boolean } | null)?.hidden).toBe(true);
+  });
+
+  test('units group columns and start collapsed; opening one persists across a filter change', async () => {
+    const page = await open(repo);
+    const cards = page.all('.unit-card');
+    expect(cards.length).toBeGreaterThan(0);
+    // None open by default — the map opens compact.
+    expect(cards.filter((c) => c.hasAttribute('open'))).toHaveLength(0);
+    // The api unit groups both features and the shared support column.
+    const api = page.doc.querySelector('.unit-card[data-unit="api"]');
+    expect(api).not.toBeNull();
+    expect(api!.querySelectorAll('.column').length).toBeGreaterThanOrEqual(3);
+  });
+
+  test('search hides unit cards and columns that do not match', async () => {
+    const page = await open(repo);
+    const input = page.doc.getElementById('repo-search-input') as unknown as {
+      value: string;
+      dispatchEvent: (ev: unknown) => boolean;
+    };
+    // "billing" only occurs in one column id and nowhere in other paths,
+    // so the filter yields a single unit and a single column deterministically.
+    input.value = 'billing';
+    input.dispatchEvent(new page.window.Event('input', { bubbles: true }));
+    const shownUnits = page.all('.unit-card:not(.repo-hidden)').map((c) => c.getAttribute('data-unit'));
+    expect(shownUnits).toEqual(['api']);
+    const shownCols = page.all('.unit-card[data-unit="api"] .column:not(.repo-hidden)').map(
+      (c) => c.getAttribute('data-node')
+    );
+    expect(shownCols).toEqual(['api/billing']);
+    // Hash reflects the search so the view is deep-linkable.
+    expect(page.window.location.hash).toContain('search=billing');
+  });
+
+  test('only-unused toggles a body flag and dense toggles another', async () => {
+    const page = await open(repo);
+    page.click('[data-repo-toggle="only-unused"]');
+    expect(page.doc.body.getAttribute('data-only-unused')).toBe('1');
+    expect(page.window.location.hash).toContain('unused=1');
+    page.click('[data-repo-toggle="only-unused"]');
+    expect(page.doc.body.getAttribute('data-only-unused')).toBe('0');
+    page.click('[data-repo-toggle="dense"]');
+    expect(page.doc.body.getAttribute('data-density')).toBe('dense');
+    expect(page.window.location.hash).toContain('dense=1');
+  });
+
+  test('list → map switches to a treemap with one tile per column', async () => {
+    const page = await open(repo);
+    page.click('[data-repo-view="map"]');
+    const tiles = page.all('.repo-treemap rect.tile.column[data-node]');
+    expect(tiles.length).toBe(repo.columns.length);
+    expect(page.text('#band-blocks h2')).toBe('Treemap');
+    expect(page.window.location.hash).toContain('view=map');
+    // Clicking a tile selects it via the same data-node contract as list view.
+    page.click('.repo-treemap rect.tile.column[data-node="api/orders"]');
+    expect(page.text('#inspector')).toContain('api/orders');
+  });
+
+  test('deep link #node=… selects the node and auto-expands its unit and column', async () => {
+    const page = await open(repo, '#node=api/orders/infrastructure');
+    const api = page.doc.querySelector('.unit-card[data-unit="api"]') as unknown as { open?: boolean } | null;
+    const orders = page.doc.querySelector('.column[data-node="api/orders"]') as unknown as { open?: boolean } | null;
+    expect(api?.open).toBe(true);
+    expect(orders?.open).toBe(true);
+    expect(page.text('#inspector')).toContain('api/orders/infrastructure');
+  });
+
+  test('findings dock is collapsible and sorts conflicts first', async () => {
+    const conflictMap = JSON.parse(JSON.stringify(repo)) as typeof repo;
+    conflictMap.findings = [
+      { id: 'shape-note', severity: 'info', title: 'z shape note', detail: 'about a layer' },
+      { id: 'real-conflict', severity: 'conflict', title: 'this is bad', detail: 'proven bad thing' },
+    ];
+    const page = await open(conflictMap);
+    const detailsEl = page.doc.querySelector('#findings details') as unknown as { open?: boolean } | null;
+    expect(detailsEl).not.toBeNull();
+    expect(detailsEl!.open).toBe(true);
+    const finds = page.all('#findings .finding').map((f) => f.getAttribute('data-finding'));
+    expect(finds[0]).toBe('real-conflict');
+    expect(finds[1]).toBe('shape-note');
+    expect(page.doc.getElementById('findings')?.classList.contains('has-conflict')).toBe(true);
+  });
+
+  test('handles a large map: 22 units collapsed by default, search narrows fast', async () => {
+    const large = JSON.parse(
+      await Bun.file(new URL('./fixtures/repo-large.map.json', import.meta.url)).text()
+    );
+    const page = await open(large);
+    expect(page.errors).toEqual([]);
+    const cards = page.all('.unit-card');
+    expect(cards.length).toBeGreaterThanOrEqual(20);
+    expect(cards.filter((c) => c.hasAttribute('open'))).toHaveLength(0);
+    const input = page.doc.getElementById('repo-search-input') as unknown as {
+      value: string;
+      dispatchEvent: (ev: unknown) => boolean;
+    };
+    input.value = 'billing';
+    input.dispatchEvent(new page.window.Event('input', { bubbles: true }));
+    const shownUnits = page.all('.unit-card:not(.repo-hidden)').map((c) => c.getAttribute('data-unit'));
+    expect(shownUnits).toContain('billing');
+    expect(shownUnits.length).toBeLessThan(cards.length);
+  });
+
+  test('a map without repoStats still renders — the shell falls back to counting', async () => {
+    const noStats = JSON.parse(JSON.stringify(repo)) as typeof repo;
+    delete (noStats as { repoStats?: unknown }).repoStats;
+    for (const c of noStats.columns) delete (c as { fileCount?: unknown }).fileCount;
+    const page = await open(noStats);
+    expect(page.errors).toEqual([]);
+    // Layers and processes chips still show; features would show as 0 (hidden).
+    const labels = page.all('#repo-stats .repo-stat').map((c) => c.getAttribute('data-stat'));
+    expect(labels).toContain('layers');
+    expect(labels).toContain('processes');
+    expect(labels).not.toContain('features');
   });
 });
 

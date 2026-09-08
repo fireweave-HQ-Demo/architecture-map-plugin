@@ -923,6 +923,302 @@
         stroke-dasharray: 10 8;
         animation: hop-dash 0.9s linear infinite;
       }
+      /* ---- repo mode: progressive-disclosure browser + treemap ---- */
+      body[data-mode='repo'] .hops {
+        display: none;
+      }
+      body[data-mode='repo'] .story {
+        grid-template-columns: 1fr;
+      }
+      body[data-mode='repo'] .hop-overlay {
+        display: none;
+      }
+      .repo-toolbar {
+        display: none;
+        flex-wrap: wrap;
+        gap: 8px 12px;
+        align-items: center;
+        margin: 0 0 14px;
+        padding: 12px 14px;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+      }
+      body[data-mode='repo'] .repo-toolbar {
+        display: flex;
+      }
+      .repo-search {
+        flex: 1 1 220px;
+        min-width: 180px;
+        border: 1px solid var(--line);
+        background: var(--page);
+        border-radius: 999px;
+        padding: 7px 14px;
+        font-size: 13px;
+        font-family: inherit;
+        color: var(--ink);
+      }
+      .repo-search:focus {
+        outline: 2px solid var(--accent);
+        outline-offset: 1px;
+        background: var(--card);
+      }
+      .repo-group {
+        display: inline-flex;
+        gap: 4px;
+        padding: 3px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--page);
+      }
+      .repo-group .chip {
+        border: none;
+        background: transparent;
+        padding: 4px 10px;
+      }
+      .repo-group .chip[aria-pressed='true'] {
+        background: var(--accent);
+        color: var(--on-accent);
+      }
+      .repo-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 0 0 12px;
+      }
+      body[data-mode='repo'] .repo-stats {
+        display: flex;
+      }
+      .repo-stat {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: var(--halo);
+        color: var(--accent);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .repo-stat .n {
+        font-size: 13px;
+        font-weight: 800;
+      }
+      body[data-mode='repo'] .findings {
+        border-left: 4px solid var(--accent);
+      }
+      body[data-mode='repo'] .findings.has-conflict {
+        border-left-color: var(--conflict);
+      }
+      body[data-mode='repo'] .findings summary {
+        cursor: pointer;
+        list-style: none;
+        margin: 0 0 8px;
+        font-size: 11px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        font-weight: 650;
+        color: var(--smoke);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      body[data-mode='repo'] .findings summary::-webkit-details-marker {
+        display: none;
+      }
+      body[data-mode='repo'] .findings .finding {
+        border-left: 2px solid var(--line);
+        padding: 4px 0 4px 10px;
+      }
+      body[data-mode='repo'] .findings .finding.conflict {
+        border-left-color: var(--conflict);
+      }
+      body[data-mode='repo'] .findings .finding.proposed {
+        border-left-color: var(--info);
+      }
+      .units {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .unit-card {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--card);
+        padding: 10px 14px;
+      }
+      .unit-card[open] {
+        background: var(--card);
+        border-color: var(--accent);
+      }
+      .unit-card > summary {
+        cursor: pointer;
+        list-style: none;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 10px;
+      }
+      .unit-card > summary::-webkit-details-marker {
+        display: none;
+      }
+      .unit-card > summary::before {
+        content: '▸';
+        color: var(--smoke);
+        font-size: 10px;
+        width: 12px;
+      }
+      .unit-card[open] > summary::before {
+        content: '▾';
+      }
+      .unit-card .unit-name {
+        font-size: 14px;
+        font-weight: 700;
+      }
+      .unit-card .unit-stats {
+        font-size: 11px;
+        color: var(--smoke);
+        font-weight: 600;
+      }
+      .unit-card .unit-columns {
+        margin-top: 10px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 8px;
+      }
+      body[data-density='dense'] .unit-card .unit-columns {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      }
+      body[data-mode='repo'] .column {
+        display: flex;
+        flex-direction: column;
+        max-width: none;
+        min-width: 0;
+      }
+      body[data-mode='repo'] details.column {
+        padding: 6px 10px;
+      }
+      body[data-mode='repo'] details.column > summary {
+        cursor: pointer;
+        list-style: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 8px;
+        padding: 2px 0;
+      }
+      body[data-mode='repo'] details.column > summary::-webkit-details-marker {
+        display: none;
+      }
+      body[data-mode='repo'] details.column > summary .name {
+        margin: 0;
+        padding: 0;
+        font-size: 13px;
+      }
+      body[data-mode='repo'] details.column > summary .col-meta {
+        font-size: 10px;
+        color: var(--smoke);
+        font-weight: 700;
+        letter-spacing: 0.04em;
+      }
+      body[data-mode='repo'] details.column[open] > summary::after {
+        content: '▾';
+        color: var(--smoke);
+        font-size: 10px;
+        margin-left: auto;
+      }
+      body[data-mode='repo'] details.column:not([open]) > summary::after {
+        content: '▸';
+        color: var(--smoke);
+        font-size: 10px;
+        margin-left: auto;
+      }
+      body[data-mode='repo'] details.column > .layer:first-of-type {
+        margin-top: 8px;
+      }
+      body[data-density='dense'] .unit-card .layer .files {
+        display: none;
+      }
+      body[data-only-unused='1'] .unit-card:not(.has-unused) {
+        display: none;
+      }
+      body[data-only-unused='1'] .unit-card .column:not(.unused) {
+        display: none;
+      }
+      .repo-hidden {
+        display: none !important;
+      }
+      .unit-empty {
+        color: var(--smoke);
+        font-size: 12px;
+        padding: 8px 4px;
+      }
+      .repo-treemap-wrap {
+        margin-top: 8px;
+      }
+      .repo-treemap {
+        width: 100%;
+        height: 520px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--page);
+        display: block;
+      }
+      .repo-treemap rect.tile {
+        cursor: pointer;
+        stroke: var(--card);
+        stroke-width: 2;
+      }
+      .repo-treemap rect.tile.unit {
+        fill: var(--halo);
+      }
+      .repo-treemap rect.tile.column {
+        fill: var(--card);
+        stroke: var(--line);
+      }
+      .repo-treemap rect.tile.column.hover,
+      .repo-treemap rect.tile.column:hover {
+        fill: var(--halo);
+        stroke: var(--accent);
+      }
+      .repo-treemap text.label {
+        pointer-events: none;
+        font-family: var(--font);
+        font-weight: 650;
+        fill: var(--ink);
+      }
+      .repo-treemap text.meta {
+        pointer-events: none;
+        font-family: var(--mono);
+        fill: var(--smoke);
+        font-size: 10px;
+      }
+      .repo-breadcrumb {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        font-size: 12px;
+        color: var(--smoke);
+        margin: 0 0 8px;
+      }
+      .repo-breadcrumb button {
+        background: none;
+        border: none;
+        color: var(--accent);
+        cursor: pointer;
+        padding: 0;
+        font-family: inherit;
+        font-size: inherit;
+      }
+      .repo-empty {
+        padding: 24px 16px;
+        text-align: center;
+        color: var(--smoke);
+        font-size: 13px;
+      }
     </style>
   </head>
   <body data-shell="architecture-map-interactive" data-repo-root="">
@@ -941,6 +1237,8 @@
       </p>
     </header>
     <div class="pr-bar" id="pr-bar" hidden></div>
+    <div class="repo-stats" id="repo-stats" hidden></div>
+    <div class="repo-toolbar" id="repo-toolbar" role="toolbar" aria-label="Repo browser" hidden></div>
     <div class="legend" id="legend"></div>
     <div class="toolbar" id="toolbar" role="toolbar" aria-label="Status filter">
       <button class="chip" type="button" data-filter="all" aria-pressed="true">
@@ -1045,9 +1343,18 @@
         hop: 0,
         node: '',
         playing: false,
+        /* repo-mode state; ignored in other modes */
+        repoView: 'list', // 'list' | 'map'
+        repoSearch: '',
+        repoTypes: [], // e.g. ['app'] to keep only apps; empty = all
+        repoOnlyUnused: false,
+        repoDense: false,
+        repoOpenUnits: {}, // { [unitId]: true } — expanded unit cards
+        repoOpenColumns: {}, // { [columnId]: true } — expanded columns
       };
       let playTimer = 0;
       let mapRef = null;
+      let repoTree = null; // cached unit → columns index, keyed by mapRef
       start();
 
       function parseInjectedMapJson(text) {
@@ -1078,9 +1385,12 @@
 
       function boot(map) {
         mapRef = map;
+        // Hash-derived UI state (deep links, view, filters) must land
+        // before the first paint so repo-mode ancestors expand and the
+        // selected node is visible without a second render pass.
+        applyHash(map);
         render(map);
         bind(map);
-        applyHash(map);
         syncSelection(map);
       }
 
@@ -1258,6 +1568,15 @@
               .replace(/\.\d+Z$/, 'Z')
           : '';
         const isRepo = map.query.mode === 'repo';
+        document.body.setAttribute('data-mode', map.query.mode);
+        document.body.setAttribute(
+          'data-density',
+          isRepo && ui.repoDense ? 'dense' : ''
+        );
+        document.body.setAttribute(
+          'data-only-unused',
+          isRepo && ui.repoOnlyUnused ? '1' : '0'
+        );
         const sizeBit = hops.length
           ? hops.length + ' hops'
           : isRepo
@@ -1295,11 +1614,31 @@
         paintPlatform(map);
         paintBand('band-infra', 'Infra', map.infra);
         paintBand('band-process', 'Processes', map.processes);
-        paintColumns(map.columns);
+        if (isRepo) {
+          paintRepoStats(map);
+          paintRepoToolbar(map);
+          paintUnits(map);
+        } else {
+          hideRepoChrome();
+          paintColumns(map.columns);
+        }
         paintHops(map);
         paintUnknown(map.unknown || []);
         paintGrounding(map.grounding || []);
         applyFilter();
+      }
+
+      function hideRepoChrome() {
+        const stats = document.getElementById('repo-stats');
+        const bar = document.getElementById('repo-toolbar');
+        if (stats) {
+          stats.hidden = true;
+          stats.innerHTML = '';
+        }
+        if (bar) {
+          bar.hidden = true;
+          bar.innerHTML = '';
+        }
       }
 
       function paintVerdict(map) {
@@ -1626,6 +1965,404 @@
         root.appendChild(wrap);
       }
 
+      // ----- repo mode: progressive-disclosure browser + treemap -----
+
+      function paintRepoStats(map) {
+        const root = document.getElementById('repo-stats');
+        if (!root) return;
+        root.innerHTML = '';
+        root.hidden = false;
+        const stats = map.repoStats || {
+          units: 0,
+          features: 0,
+          layers: (map.columns || []).reduce(function (s, c) { return s + (c.layers || []).length; }, 0),
+          files: (map.columns || []).reduce(function (s, c) { return s + (c.fileCount || 0); }, 0),
+          infra: (map.infra || []).length,
+          processes: (map.processes || []).length,
+        };
+        const chips = [
+          { n: stats.units, label: 'units' },
+          { n: stats.features, label: 'features' },
+          { n: stats.layers, label: 'layers' },
+          { n: stats.files, label: 'files' },
+          { n: stats.infra, label: 'infra' },
+          { n: stats.processes, label: 'processes' },
+        ];
+        chips.forEach(function (c) {
+          if (!c.n) return;
+          const chip = document.createElement('span');
+          chip.className = 'repo-stat';
+          chip.setAttribute('data-stat', c.label);
+          const n = document.createElement('span');
+          n.className = 'n';
+          n.textContent = String(c.n);
+          chip.appendChild(n);
+          chip.appendChild(document.createTextNode(' ' + c.label));
+          root.appendChild(chip);
+        });
+      }
+
+      function paintRepoToolbar(map) {
+        const root = document.getElementById('repo-toolbar');
+        if (!root) return;
+        root.innerHTML = '';
+        root.hidden = false;
+        const search = document.createElement('input');
+        search.type = 'search';
+        search.className = 'repo-search';
+        search.id = 'repo-search-input';
+        search.placeholder = 'Search units, columns, layers, files…';
+        search.value = ui.repoSearch;
+        search.setAttribute('aria-label', 'Search the repository surface');
+        // Direct listener as well as the body-level delegator, so search
+        // updates land even when `input` events do not bubble (some DOM
+        // shims short-circuit the bubbling phase for form elements).
+        search.addEventListener('input', function () {
+          ui.repoSearch = String(search.value || '').trim().toLowerCase();
+          writeHash();
+          applyRepoFilters();
+        });
+        root.appendChild(search);
+        const viewGroup = document.createElement('div');
+        viewGroup.className = 'repo-group';
+        viewGroup.setAttribute('role', 'group');
+        viewGroup.setAttribute('aria-label', 'View');
+        ['list', 'map'].forEach(function (v) {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'chip';
+          b.setAttribute('data-repo-view', v);
+          b.setAttribute('aria-pressed', ui.repoView === v ? 'true' : 'false');
+          b.textContent = v === 'list' ? 'List' : 'Map';
+          viewGroup.appendChild(b);
+        });
+        root.appendChild(viewGroup);
+        const unusedBtn = document.createElement('button');
+        unusedBtn.type = 'button';
+        unusedBtn.className = 'chip';
+        unusedBtn.setAttribute('data-repo-toggle', 'only-unused');
+        unusedBtn.setAttribute('aria-pressed', ui.repoOnlyUnused ? 'true' : 'false');
+        unusedBtn.textContent = 'Only unused';
+        root.appendChild(unusedBtn);
+        const denseBtn = document.createElement('button');
+        denseBtn.type = 'button';
+        denseBtn.className = 'chip';
+        denseBtn.setAttribute('data-repo-toggle', 'dense');
+        denseBtn.setAttribute('aria-pressed', ui.repoDense ? 'true' : 'false');
+        denseBtn.textContent = 'Dense';
+        root.appendChild(denseBtn);
+      }
+
+      function groupColumnsByUnit(columns) {
+        const groups = new Map();
+        (columns || []).forEach(function (col) {
+          const unitId = String(col.id || '').split('/')[0] || col.id || '';
+          if (!groups.has(unitId)) groups.set(unitId, { unitId: unitId, columns: [] });
+          groups.get(unitId).columns.push(col);
+        });
+        return Array.from(groups.values());
+      }
+
+      function paintUnits(map) {
+        const root = document.getElementById('band-blocks');
+        root.innerHTML = '';
+        const h = document.createElement('h2');
+        h.textContent = ui.repoView === 'map' ? 'Treemap' : 'Units';
+        root.appendChild(h);
+        if (ui.repoView === 'map') {
+          paintTreemap(map, root);
+          return;
+        }
+        const groups = groupColumnsByUnit(map.columns || []);
+        const processIds = new Set((map.processes || []).map(function (p) { return p.id; }));
+        if (!groups.length) {
+          const empty = document.createElement('p');
+          empty.className = 'repo-empty';
+          empty.textContent = 'No code units found on this map.';
+          root.appendChild(empty);
+          return;
+        }
+        const wrap = document.createElement('div');
+        wrap.className = 'units';
+        groups.forEach(function (group) {
+          const unitEl = document.createElement('details');
+          unitEl.className = 'unit-card';
+          unitEl.setAttribute('data-unit', group.unitId);
+          if (ui.repoOpenUnits[group.unitId]) unitEl.open = true;
+          if (group.columns.some(function (c) { return !c.used; })) {
+            unitEl.classList.add('has-unused');
+          }
+          const summary = document.createElement('summary');
+          const nm = document.createElement('span');
+          nm.className = 'unit-name';
+          nm.textContent = group.unitId;
+          summary.appendChild(nm);
+          const meta = document.createElement('span');
+          meta.className = 'unit-stats';
+          const fileTotal = group.columns.reduce(function (n, c) {
+            return n + (typeof c.fileCount === 'number' ? c.fileCount : 0);
+          }, 0);
+          const bits = [
+            group.columns.length + (group.columns.length === 1 ? ' column' : ' columns'),
+          ];
+          if (fileTotal) bits.push(fileTotal + (fileTotal === 1 ? ' file' : ' files'));
+          if (processIds.has(group.unitId)) bits.push('process');
+          meta.textContent = bits.join(' · ');
+          summary.appendChild(meta);
+          unitEl.appendChild(summary);
+          const colWrap = document.createElement('div');
+          colWrap.className = 'unit-columns';
+          group.columns.forEach(function (col) {
+            colWrap.appendChild(renderColumnCard(col));
+          });
+          unitEl.appendChild(colWrap);
+          wrap.appendChild(unitEl);
+        });
+        root.appendChild(wrap);
+        applyRepoFilters();
+      }
+
+      function renderColumnCard(col) {
+        const card = document.createElement('details');
+        card.className =
+          'column ' + (col.used ? 'used' : 'unused') + (st(col) ? ' ' + st(col) : '');
+        card.setAttribute('data-node', col.id);
+        if (st(col)) card.setAttribute('data-status', st(col));
+        if (ui.repoOpenColumns[col.id]) card.open = true;
+        const summary = document.createElement('summary');
+        const name = document.createElement('div');
+        name.className = 'name';
+        name.textContent = col.label || col.id;
+        const meta = document.createElement('span');
+        meta.className = 'col-meta';
+        const bits = [col.kind];
+        if (typeof col.fileCount === 'number') {
+          bits.push(col.fileCount + (col.fileCount === 1 ? ' file' : ' files'));
+        }
+        meta.textContent = bits.join(' · ');
+        summary.appendChild(name);
+        summary.appendChild(meta);
+        card.appendChild(summary);
+        (col.layers || []).forEach(function (layer) {
+          const layerEl = document.createElement('div');
+          layerEl.className =
+            'layer ' + (layer.used ? 'used' : 'unused') + (st(layer) ? ' ' + st(layer) : '');
+          layerEl.setAttribute('data-node', layer.id);
+          layerEl.setAttribute('tabindex', '0');
+          layerEl.setAttribute('role', 'button');
+          if (st(layer)) layerEl.setAttribute('data-status', st(layer));
+          layerEl.appendChild(document.createTextNode(layer.label));
+          if (layer.files && layer.files.length) {
+            const ul = document.createElement('ul');
+            ul.className = 'files';
+            layer.files.forEach(function (f) {
+              const li = document.createElement('li');
+              li.textContent = f;
+              li.title = f;
+              ul.appendChild(li);
+            });
+            layerEl.appendChild(ul);
+          }
+          card.appendChild(layerEl);
+        });
+        return card;
+      }
+
+      /**
+       * Slice-and-dice treemap. Not perfectly squarified, but every tile
+       * is proportional to its file weight and no tile is dropped — good
+       * enough for a repository overview at a glance. Split point is
+       * clamped so both sides always shrink; otherwise a weight run that
+       * only crosses total/2 on the last item would recurse on the same
+       * slice forever.
+       */
+      function sliceLayout(items, rect, direction, place) {
+        if (!items.length || rect.w <= 0 || rect.h <= 0) return;
+        if (items.length === 1) {
+          place(items[0], rect);
+          return;
+        }
+        const total = items.reduce(function (s, i) { return s + i.weight; }, 0);
+        if (total <= 0) return;
+        let cum = 0;
+        let split = 1;
+        for (let i = 0; i < items.length; i++) {
+          cum += items[i].weight;
+          if (cum >= total / 2) {
+            split = i + 1;
+            break;
+          }
+        }
+        if (split >= items.length) split = items.length - 1;
+        if (split < 1) split = 1;
+        const left = items.slice(0, split);
+        const right = items.slice(split);
+        const leftSum = left.reduce(function (s, i) { return s + i.weight; }, 0);
+        const ratio = leftSum / total;
+        if (direction === 'h') {
+          const w1 = rect.w * ratio;
+          sliceLayout(left, { x: rect.x, y: rect.y, w: w1, h: rect.h }, 'v', place);
+          sliceLayout(right, { x: rect.x + w1, y: rect.y, w: rect.w - w1, h: rect.h }, 'v', place);
+        } else {
+          const h1 = rect.h * ratio;
+          sliceLayout(left, { x: rect.x, y: rect.y, w: rect.w, h: h1 }, 'h', place);
+          sliceLayout(right, { x: rect.x, y: rect.y + h1, w: rect.w, h: rect.h - h1 }, 'h', place);
+        }
+      }
+
+      function svgN(name, attrs) {
+        const n = document.createElementNS('http://www.w3.org/2000/svg', name);
+        Object.keys(attrs || {}).forEach(function (k) {
+          // classList tolerates whitespace-separated tokens and matches
+          // CSS `.tile.column` selectors in every renderer we care about,
+          // whereas SVG's `class` attribute is a SVGAnimatedString that
+          // some DOM shims don't reflect through querySelector.
+          if (k === 'class') {
+            String(attrs[k]).split(/\s+/).filter(Boolean).forEach(function (c) {
+              n.classList.add(c);
+            });
+          } else {
+            n.setAttribute(k, attrs[k]);
+          }
+        });
+        return n;
+      }
+
+      function paintTreemap(map, root) {
+        const wrap = document.createElement('div');
+        wrap.className = 'repo-treemap-wrap';
+        const bc = document.createElement('div');
+        bc.className = 'repo-breadcrumb';
+        bc.textContent = 'Repo overview — click a tile to inspect';
+        wrap.appendChild(bc);
+        const width = 1000;
+        const height = 520;
+        const svg = svgN('svg', {
+          class: 'repo-treemap',
+          viewBox: '0 0 ' + width + ' ' + height,
+          preserveAspectRatio: 'xMidYMid meet',
+          role: 'img',
+          'aria-label': 'Repository treemap sized by file count',
+        });
+        const groups = groupColumnsByUnit(map.columns || []);
+        const unitItems = groups.map(function (g) {
+          const w = g.columns.reduce(function (n, c) {
+            return n + Math.max(typeof c.fileCount === 'number' ? c.fileCount : 1, 1);
+          }, 0);
+          return { id: g.unitId, group: g, weight: w };
+        });
+        const totalWeight = unitItems.reduce(function (s, u) { return s + u.weight; }, 0);
+        if (totalWeight <= 0) {
+          const t = svgN('text', {
+            x: String(width / 2),
+            y: String(height / 2),
+            'text-anchor': 'middle',
+            class: 'meta',
+          });
+          t.textContent = 'No file counts — re-run init to populate repoStats';
+          svg.appendChild(t);
+        } else {
+          sliceLayout(unitItems, { x: 0, y: 0, w: width, h: height }, 'h', function (unit, rect) {
+            const bg = svgN('rect', {
+              class: 'tile unit',
+              x: String(rect.x),
+              y: String(rect.y),
+              width: String(rect.w),
+              height: String(rect.h),
+              'data-unit': unit.id,
+            });
+            svg.appendChild(bg);
+            if (rect.w > 40 && rect.h > 24) {
+              const label = svgN('text', {
+                class: 'label',
+                x: String(rect.x + 8),
+                y: String(rect.y + 18),
+                'font-size': String(Math.min(16, Math.max(10, rect.w / 12))),
+              });
+              label.textContent = unit.id;
+              svg.appendChild(label);
+            }
+            const inner = {
+              x: rect.x + 4,
+              y: rect.y + (rect.h > 24 ? 24 : 4),
+              w: rect.w - 8,
+              h: rect.h - (rect.h > 24 ? 28 : 8),
+            };
+            if (inner.w < 20 || inner.h < 12) return;
+            const colItems = unit.group.columns.map(function (c) {
+              return {
+                id: c.id,
+                col: c,
+                weight: Math.max(typeof c.fileCount === 'number' ? c.fileCount : 1, 1),
+              };
+            });
+            sliceLayout(colItems, inner, 'h', function (colItem, r) {
+              const tile = svgN('rect', {
+                class: 'tile column',
+                x: String(r.x),
+                y: String(r.y),
+                width: String(r.w),
+                height: String(r.h),
+                'data-node': colItem.id,
+                tabindex: '0',
+                role: 'button',
+              });
+              svg.appendChild(tile);
+              if (r.w < 42 || r.h < 14) return;
+              const parts = String(colItem.id).split('/');
+              const labelText = parts.slice(1).join('/') || parts[0];
+              const t = svgN('text', {
+                class: 'label',
+                x: String(r.x + 4),
+                y: String(r.y + 12),
+                'font-size': String(Math.min(11, Math.max(8, r.w / 20))),
+              });
+              t.textContent = labelText;
+              svg.appendChild(t);
+              if (r.w >= 60 && r.h >= 32 && typeof colItem.col.fileCount === 'number') {
+                const m = svgN('text', {
+                  class: 'meta',
+                  x: String(r.x + 4),
+                  y: String(r.y + 24),
+                });
+                m.textContent =
+                  colItem.col.fileCount +
+                  (colItem.col.fileCount === 1 ? ' file' : ' files');
+                svg.appendChild(m);
+              }
+            });
+          });
+        }
+        wrap.appendChild(svg);
+        root.appendChild(wrap);
+      }
+
+      function applyRepoFilters() {
+        if (!mapRef || (mapRef.query && mapRef.query.mode !== 'repo')) return;
+        document.body.setAttribute(
+          'data-only-unused',
+          ui.repoOnlyUnused ? '1' : '0'
+        );
+        document.body.setAttribute(
+          'data-density',
+          ui.repoDense ? 'dense' : ''
+        );
+        const q = ui.repoSearch;
+        document.querySelectorAll('.unit-card').forEach(function (unitEl) {
+          const unitId = (unitEl.getAttribute('data-unit') || '').toLowerCase();
+          let anyColShown = false;
+          unitEl.querySelectorAll('.column').forEach(function (colEl) {
+            const id = (colEl.getAttribute('data-node') || '').toLowerCase();
+            const haystack = id + ' ' + (colEl.textContent || '').toLowerCase();
+            const match = !q || haystack.indexOf(q) !== -1;
+            colEl.classList.toggle('repo-hidden', !match);
+            if (match) anyColShown = true;
+          });
+          const unitMatch = !q || unitId.indexOf(q) !== -1 || anyColShown;
+          unitEl.classList.toggle('repo-hidden', !unitMatch);
+        });
+      }
+
       function paintPathStrip(map) {
         const wrap = document.getElementById('path-strip');
         const pills = document.getElementById('path-pills');
@@ -1820,21 +2557,50 @@
         root.appendChild(aside);
       }
 
+      function severityRank(s) {
+        if (s === 'conflict') return 0;
+        if (s === 'proposed') return 1;
+        if (s === 'info') return 2;
+        return 3;
+      }
+
       function paintFindings(map) {
         const root = document.getElementById('findings');
         root.innerHTML = '';
         root.className = '';
         const items = (map && map.findings) || [];
         if (!items.length) return;
-        root.className = 'findings';
-        const h = document.createElement('h2');
-        h.textContent =
-          map.query && map.query.mode === 'pr'
-            ? 'What this PR changes'
-            : 'Findings';
-        root.appendChild(h);
+        const isRepo = map.query && map.query.mode === 'repo';
+        const isPr = map.query && map.query.mode === 'pr';
+        // Repo mode sorts by severity — a conflict must not hide below a
+        // dozen info-level shape notes.
+        const ordered = isRepo
+          ? items.slice().sort(function (a, b) {
+              return severityRank(a.severity) - severityRank(b.severity);
+            })
+          : items;
+        const hasConflict = ordered.some(function (f) { return f.severity === 'conflict'; });
+        root.className = 'findings' + (isRepo && hasConflict ? ' has-conflict' : '');
+        // In repo mode the block is collapsible; opens by default if there
+        // is any conflict, or when the map is small enough that hiding
+        // findings under a summary would be silly.
+        const container = isRepo ? document.createElement('details') : root;
+        if (isRepo) {
+          if (hasConflict || ordered.length <= 3) container.open = true;
+          const summary = document.createElement('summary');
+          const badge = document.createElement('span');
+          badge.className = 'sev';
+          badge.textContent = hasConflict ? 'conflict' : ordered.length + ' findings';
+          summary.appendChild(badge);
+          summary.appendChild(document.createTextNode('Findings'));
+          container.appendChild(summary);
+        } else {
+          const h = document.createElement('h2');
+          h.textContent = isPr ? 'What this PR changes' : 'Findings';
+          root.appendChild(h);
+        }
         const ol = document.createElement('ol');
-        items.forEach(function (f) {
+        ordered.forEach(function (f) {
           const li = document.createElement('li');
           li.className = 'finding ' + (f.severity || '');
           li.setAttribute('data-finding', f.id);
@@ -1842,8 +2608,7 @@
           if (f.hop) li.setAttribute('data-hop', String(f.hop));
           const sev = document.createElement('div');
           sev.className = 'sev';
-          const pr = map.query && map.query.mode === 'pr';
-          sev.textContent = pr
+          sev.textContent = isPr
             ? f.severity === 'proposed'
               ? 'change'
               : f.severity === 'info'
@@ -1861,7 +2626,8 @@
           li.appendChild(detail);
           ol.appendChild(li);
         });
-        root.appendChild(ol);
+        container.appendChild(ol);
+        if (isRepo) root.appendChild(container);
       }
 
       function paintUnknown(items) {
@@ -2181,8 +2947,19 @@
 
       function writeHash() {
         let next = '';
-        if (ui.hop) next = '#hop=' + ui.hop;
-        else if (ui.node) next = '#node=' + encodeURIComponent(ui.node);
+        if (mapRef && mapRef.query && mapRef.query.mode === 'repo') {
+          const parts = [];
+          if (ui.repoView && ui.repoView !== 'list') parts.push('view=' + ui.repoView);
+          if (ui.node) parts.push('node=' + encodeURIComponent(ui.node));
+          if (ui.repoSearch) parts.push('search=' + encodeURIComponent(ui.repoSearch));
+          if (ui.repoOnlyUnused) parts.push('unused=1');
+          if (ui.repoDense) parts.push('dense=1');
+          next = parts.length ? '#' + parts.join('&') : '';
+        } else if (ui.hop) {
+          next = '#hop=' + ui.hop;
+        } else if (ui.node) {
+          next = '#node=' + encodeURIComponent(ui.node);
+        }
         if (location.hash !== next) {
           history.replaceState(
             null,
@@ -2192,10 +2969,44 @@
         }
       }
 
+      function parseHashParams(hash) {
+        const clean = String(hash || '').replace(/^#/, '');
+        const params = {};
+        if (!clean) return params;
+        clean.split('&').forEach(function (kv) {
+          const eq = kv.indexOf('=');
+          const k = eq === -1 ? kv : kv.slice(0, eq);
+          const v = eq === -1 ? '' : kv.slice(eq + 1);
+          if (k) params[k] = decodeURIComponent(v);
+        });
+        return params;
+      }
+
       function applyHash(map) {
-        const hash = (location.hash || '').replace(/^#/, '');
-        if (hash.indexOf('hop=') === 0) {
-          const n = Number(hash.slice(4));
+        const hash = location.hash || '';
+        const isRepo = map.query && map.query.mode === 'repo';
+        if (isRepo) {
+          const p = parseHashParams(hash);
+          ui.repoView = p.view === 'map' ? 'map' : 'list';
+          ui.repoSearch = String(p.search || '').toLowerCase();
+          ui.repoOnlyUnused = p.unused === '1';
+          ui.repoDense = p.dense === '1';
+          if (p.node) {
+            ui.node = p.node;
+            ui.hop = 0;
+            // Auto-expand ancestor units so the selected node is visible.
+            const parts = ui.node.split('/');
+            if (parts[0]) ui.repoOpenUnits[parts[0]] = true;
+            if (parts.length >= 2) ui.repoOpenColumns[parts[0] + '/' + parts[1]] = true;
+          } else {
+            ui.node = '';
+            ui.hop = 0;
+          }
+          return;
+        }
+        const clean = hash.replace(/^#/, '');
+        if (clean.indexOf('hop=') === 0) {
+          const n = Number(clean.slice(4));
           if (
             (map.hops || []).some(function (h) {
               return h.n === n;
@@ -2206,8 +3017,8 @@
             return;
           }
         }
-        if (hash.indexOf('node=') === 0) {
-          ui.node = decodeURIComponent(hash.slice(5));
+        if (clean.indexOf('node=') === 0) {
+          ui.node = decodeURIComponent(clean.slice(5));
           ui.hop = 0;
           return;
         }
@@ -2338,6 +3149,28 @@
             else startPlay(map);
             return;
           }
+          const repoViewBtn = t.closest('[data-repo-view]');
+          if (repoViewBtn) {
+            const next = repoViewBtn.getAttribute('data-repo-view') || 'list';
+            if (next !== ui.repoView) {
+              ui.repoView = next;
+              paintUnits(map);
+              paintRepoToolbar(map);
+              writeHash();
+              syncSelection(map);
+            }
+            return;
+          }
+          const repoToggle = t.closest('[data-repo-toggle]');
+          if (repoToggle) {
+            const key = repoToggle.getAttribute('data-repo-toggle');
+            if (key === 'only-unused') ui.repoOnlyUnused = !ui.repoOnlyUnused;
+            else if (key === 'dense') ui.repoDense = !ui.repoDense;
+            paintRepoToolbar(map);
+            applyRepoFilters();
+            writeHash();
+            return;
+          }
           const filter = t.closest('[data-filter]');
           if (filter) {
             ui.filter = filter.getAttribute('data-filter') || 'all';
@@ -2462,8 +3295,47 @@
             if (prev) selectHop(map, prev.n);
           }
         });
+        document.body.addEventListener('input', function (ev) {
+          const t = ev.target;
+          if (!t || t.id !== 'repo-search-input') return;
+          ui.repoSearch = String(t.value || '').trim().toLowerCase();
+          writeHash();
+          applyRepoFilters();
+        });
+        // Track expand/collapse of unit and column details. `toggle` does
+        // not bubble, so capture at the root.
+        document.body.addEventListener(
+          'toggle',
+          function (ev) {
+            const t = ev.target;
+            if (!t || t.tagName !== 'DETAILS') return;
+            if (t.classList.contains('unit-card')) {
+              const id = t.getAttribute('data-unit');
+              if (id) ui.repoOpenUnits[id] = !!t.open;
+            } else if (t.classList.contains('column')) {
+              const id = t.getAttribute('data-node');
+              if (id) ui.repoOpenColumns[id] = !!t.open;
+            }
+          },
+          true
+        );
+        // ⌘K / Ctrl+K focuses the repo search input.
+        document.body.addEventListener('keydown', function (ev) {
+          if ((ev.metaKey || ev.ctrlKey) && String(ev.key).toLowerCase() === 'k') {
+            const input = document.getElementById('repo-search-input');
+            if (input) {
+              ev.preventDefault();
+              input.focus();
+              if (typeof input.select === 'function') input.select();
+            }
+          }
+        });
         window.addEventListener('hashchange', function () {
           applyHash(map);
+          if (map.query && map.query.mode === 'repo') {
+            paintRepoToolbar(map);
+            paintUnits(map);
+          }
           syncSelection(map);
         });
         if (window.ResizeObserver) {

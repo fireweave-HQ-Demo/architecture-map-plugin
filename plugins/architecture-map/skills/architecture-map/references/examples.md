@@ -9,7 +9,8 @@ before your first map in a new repository; render them with
 
 | Prompt | Mode | Fixture | What to notice |
 | --- | --- | --- | --- |
-| `/arch-init` | repo | `repo-sample.map.json` | The draft `init` writes, plus two findings an agent added after opening the files they name. No hops. Redis is on the map and flagged as unreferenced, not dropped. |
+| `/arch-init` | repo | `repo-sample.map.json` | The draft `init` writes, plus two findings an agent added after opening the files they name. No hops. Redis is on the map and flagged as unreferenced, not dropped. `repoStats` and per-column `fileCount` feed the stats chip row and the treemap tiles. |
+| `/arch-init` on a monorepo | repo | `tests/fixtures/repo-large.map.json` (test-only) | 22 units, 44 columns, 135 files, 14 processes. Renders as collapsed unit cards behind a search input and a **List ↔ Map** toggle — the same shell that draws the 5-unit sample scales to a hundred without becoming a wall. |
 | `/arch-flow create order` | flow | `flow-create-order.map.json` | Ten hops from the browser form to the invoice row. Types are mechanisms (`HTTP`, `authz`, `database`, `message bus`); vendors live in labels. `work` is plain language; `fail` only where the file names one. |
 | `/arch-plan` with no plan body | plan | `plan-blocked-missing-entry.map.json` | `verdict: blocked`, empty hops, three questions. Infra present and idle. |
 | `/arch-plan` + "cache orders in Redis and add a nightly reports process" | plan | `plan-fail-orders-cache-cron.map.json` | `reports` is `proposed`, `api/orders/cache` is a proposed layer, one `conflict` hop with a `conflict` finding (double-billing), `verdict: fail`. |

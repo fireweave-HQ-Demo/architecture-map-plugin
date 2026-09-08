@@ -23,9 +23,11 @@ prose. `validate` enforces all of it. Fix the document, never the validator.
 | `questions[]` | plan, pr | `{id, ask, because}`; empty unless blocked |
 | `findings[]` | plan, pr, repo | `{id, severity, title, detail, nodeId?, hop?}`; severity `conflict` · `proposed` · `info` |
 | `compare` | pr only | `{base, head, pr?}` git refs; required unless blocked |
+| `repoStats` | repo only, optional | `{units, features, layers, files, infra, processes}` — non-negative integers the shell reads for the stats-chip row; the drafter computes it |
 
 `repo` and `flow` maps reject `verdict`, `questions` and `compare`. `repo`
-maps may carry `findings` (all `info`).
+maps may carry `findings` (all `info`) and `repoStats` (populated by the
+drafter). Non-repo modes reject `repoStats`.
 
 ## Node (`infra[]`, `processes[]`)
 
@@ -38,7 +40,7 @@ maps may carry `findings` (all `info`).
 
 ## Column
 
-`{ id, kind, used, label?, layers[], status? }`
+`{ id, kind, used, label?, layers[], status?, fileCount? }`
 
 - `id` mirrors disk: `<unit>/<feature>` or `<unit>/<dir>`.
 - `kind`: `layered` (domain / application / infrastructure style) ·
@@ -46,6 +48,11 @@ maps may carry `findings` (all `info`).
 - `layers[]`: `{ id, label, used, files[], status? }`; `id` extends the
   column id; `files` ≤ 6 repo-relative paths that exist (plan `proposed`:
   paths that would exist).
+- `fileCount` (optional, non-negative integer) — total non-test file
+  count for this unit. The drafter populates it so the repo treemap
+  can size tiles without re-walking the tree; the field is missing on
+  hand-written maps and the shell falls back to a flat treemap in that
+  case.
 
 Ids are unique across infra, processes, columns and layers.
 

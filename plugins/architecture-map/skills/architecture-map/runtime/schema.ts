@@ -92,6 +92,22 @@ export interface MapCompare {
   pr?: string;
 }
 
+/**
+ * Repo mode headline counts. Optional and additive — the shell falls back
+ * to counting `columns`/`infra`/`processes` when this block is absent, so
+ * older maps stay valid. Populated by `draftRepoMap` (runtime/modes/repo.ts)
+ * and consumed by the repo-mode render fork in the shell for the stats
+ * chips row. Every value is a non-negative integer.
+ */
+export interface RepoStats {
+  units: number;
+  features: number;
+  layers: number;
+  files: number;
+  infra: number;
+  processes: number;
+}
+
 export interface MapNodeUse {
   id: string;
   used: boolean;
@@ -115,6 +131,13 @@ export interface MapColumn {
   label?: string;
   layers: MapLayer[];
   status?: PlanStatus;
+  /**
+   * Non-negative integer file count for this unit (repo mode only). The
+   * drafter populates it so the shell can size a treemap tile without
+   * re-walking the tree; other modes leave it undefined. Absence means
+   * "unknown" — the shell must not assume zero.
+   */
+  fileCount?: number;
 }
 
 export interface MapHop {
@@ -189,6 +212,8 @@ export interface MapDocument {
   findings?: MapFinding[];
   /** PR mode: base vs head refs. Required unless the PR map is blocked. */
   compare?: MapCompare;
+  /** Repo mode only: headline counts for the stats chips row. */
+  repoStats?: RepoStats;
 }
 
 export interface MapValidationIssue {
@@ -393,6 +418,15 @@ function validateColumns(
         path: `columns[${i}].status`,
         message: `must be one of ${PLAN_STATUSES.join(', ')}`,
       });
+    }
+    if (col.fileCount !== undefined) {
+      const n = col.fileCount;
+      if (typeof n !== 'number' || !Number.isFinite(n) || !Number.isInteger(n) || n < 0) {
+        issues.push({
+          path: `columns[${i}].fileCount`,
+          message: 'must be a non-negative integer when present',
+        });
+      }
     }
     const layers = Array.isArray(col.layers) ? col.layers : null;
     if (!layers) {
@@ -720,6 +754,40 @@ function validatePrContract(
   });
 }
 
+function validateRepoStats(
+  raw: Record<string, unknown>,
+  issues: MapValidationIssue[]
+): void {
+  if (!('repoStats' in raw)) return;
+  if (modeOf(raw) !== 'repo') {
+    issues.push({
+      path: 'repoStats',
+      message: 'repoStats belongs to repo mode only',
+    });
+    return;
+  }
+  const stats = raw.repoStats;
+  if (!isRecord(stats)) {
+    issues.push({ path: 'repoStats', message: 'must be an object when present' });
+    return;
+  }
+  const fields = ['units', 'features', 'layers', 'files', 'infra', 'processes'] as const;
+  for (const field of fields) {
+    const value = stats[field];
+    if (
+      typeof value !== 'number' ||
+      !Number.isFinite(value) ||
+      !Number.isInteger(value) ||
+      value < 0
+    ) {
+      issues.push({
+        path: `repoStats.${field}`,
+        message: 'must be a non-negative integer',
+      });
+    }
+  }
+}
+
 function validateModeOnlyFields(
   raw: Record<string, unknown>,
   issues: MapValidationIssue[]
@@ -743,6 +811,7 @@ function validateModeOnlyFields(
     // Optional in repo/flow (inventory notes, dead services); shape still checked.
     if ('findings' in raw) validateFindings(raw, mode, issues);
   }
+  validateRepoStats(raw, issues);
 }
 
 export function validateMapDocument(raw: unknown): MapValidationIssue[] {

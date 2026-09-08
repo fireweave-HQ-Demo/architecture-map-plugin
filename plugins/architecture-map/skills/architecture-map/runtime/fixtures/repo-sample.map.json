@@ -65,7 +65,8 @@
             "apps/api/src/features/billing/infrastructure/persistence/pg-invoice.repository.ts"
           ]
         }
-      ]
+      ],
+      "fileCount": 3
     },
     {
       "id": "api/orders",
@@ -102,7 +103,8 @@
             "apps/api/src/features/orders/infrastructure/persistence/pg-order.repository.ts"
           ]
         }
-      ]
+      ],
+      "fileCount": 8
     },
     {
       "id": "api/shared",
@@ -118,7 +120,8 @@
             "apps/api/src/shared/auth/require-user.middleware.ts"
           ]
         }
-      ]
+      ],
+      "fileCount": 1
     },
     {
       "id": "web/src",
@@ -143,7 +146,8 @@
             "apps/web/src/routes/orders/new/+page.svelte"
           ]
         }
-      ]
+      ],
+      "fileCount": 3
     },
     {
       "id": "shared/src",
@@ -160,7 +164,8 @@
             "packages/shared/src/order-schema.ts"
           ]
         }
-      ]
+      ],
+      "fileCount": 2
     }
   ],
   "hops": [],
@@ -237,5 +242,13 @@
   ],
   "unknown": [
     "apps/web has no server code in the tree that was opened; whether it calls the API from the browser only or also server-side was not checked."
-  ]
+  ],
+  "repoStats": {
+    "units": 3,
+    "features": 2,
+    "layers": 9,
+    "files": 17,
+    "infra": 4,
+    "processes": 2
+  }
 }

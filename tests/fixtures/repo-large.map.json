@@ -1,0 +1,1471 @@
+{
+  "schemaVersion": 1,
+  "title": "acme-platform — repository surface",
+  "intent": "Everything that runs and where code lives, read from infra/compose.yaml and 22 manifests. No path is traced here; use the flow command for that.",
+  "query": {
+    "mode": "repo",
+    "name": "acme-platform"
+  },
+  "generatedAt": "2026-09-08T00:00:00Z",
+  "infra": [
+    {
+      "id": "postgres",
+      "used": true,
+      "label": "postgres (postgres:16-alpine)"
+    },
+    {
+      "id": "redis",
+      "used": true,
+      "label": "redis (redis:7-alpine)"
+    },
+    {
+      "id": "rabbitmq",
+      "used": true,
+      "label": "rabbitmq (rabbitmq:3-management)"
+    },
+    {
+      "id": "minio",
+      "used": true,
+      "label": "minio (minio/minio)"
+    },
+    {
+      "id": "prometheus",
+      "used": true,
+      "label": "prometheus (prom/prometheus)"
+    },
+    {
+      "id": "grafana",
+      "used": true,
+      "label": "grafana (grafana/grafana)"
+    }
+  ],
+  "processes": [
+    {
+      "id": "api-gateway",
+      "used": true,
+      "label": "api-gateway — apps/api-gateway"
+    },
+    {
+      "id": "api-orders",
+      "used": true,
+      "label": "api-orders — services/orders"
+    },
+    {
+      "id": "api-billing",
+      "used": true,
+      "label": "api-billing — services/billing"
+    },
+    {
+      "id": "api-catalog",
+      "used": true,
+      "label": "api-catalog — services/catalog"
+    },
+    {
+      "id": "api-inventory",
+      "used": true,
+      "label": "api-inventory — services/inventory"
+    },
+    {
+      "id": "api-shipping",
+      "used": true,
+      "label": "api-shipping — services/shipping"
+    },
+    {
+      "id": "api-notifications",
+      "used": true,
+      "label": "api-notifications — services/notifications"
+    },
+    {
+      "id": "api-search",
+      "used": true,
+      "label": "api-search — services/search"
+    },
+    {
+      "id": "api-analytics",
+      "used": true,
+      "label": "api-analytics — services/analytics"
+    },
+    {
+      "id": "api-recommendations",
+      "used": true,
+      "label": "api-recommendations — services/recommendations"
+    },
+    {
+      "id": "api-payments",
+      "used": true,
+      "label": "api-payments — services/payments"
+    },
+    {
+      "id": "web-store",
+      "used": true,
+      "label": "web-store — apps/web-store"
+    },
+    {
+      "id": "web-admin",
+      "used": true,
+      "label": "web-admin — apps/web-admin"
+    },
+    {
+      "id": "worker-jobs",
+      "used": true,
+      "label": "worker-jobs — services/worker-jobs"
+    }
+  ],
+  "columns": [
+    {
+      "id": "api-gateway/src",
+      "kind": "routes",
+      "used": true,
+      "label": "api-gateway",
+      "layers": [
+        {
+          "id": "api-gateway/src/components",
+          "label": "components",
+          "used": true,
+          "files": [
+            "apps/api-gateway/src/components/App.tsx"
+          ]
+        },
+        {
+          "id": "api-gateway/src/routes",
+          "label": "routes",
+          "used": true,
+          "files": [
+            "apps/api-gateway/src/routes/health.ts",
+            "apps/api-gateway/src/routes/index.ts"
+          ]
+        }
+      ],
+      "fileCount": 3
+    },
+    {
+      "id": "web-admin/src",
+      "kind": "routes",
+      "used": true,
+      "label": "web-admin",
+      "layers": [
+        {
+          "id": "web-admin/src/components",
+          "label": "components",
+          "used": true,
+          "files": [
+            "apps/web-admin/src/components/App.tsx"
+          ]
+        },
+        {
+          "id": "web-admin/src/routes",
+          "label": "routes",
+          "used": true,
+          "files": [
+            "apps/web-admin/src/routes/health.ts",
+            "apps/web-admin/src/routes/index.ts"
+          ]
+        }
+      ],
+      "fileCount": 3
+    },
+    {
+      "id": "web-store/src",
+      "kind": "routes",
+      "used": true,
+      "label": "web-store",
+      "layers": [
+        {
+          "id": "web-store/src/components",
+          "label": "components",
+          "used": true,
+          "files": [
+            "apps/web-store/src/components/App.tsx"
+          ]
+        },
+        {
+          "id": "web-store/src/routes",
+          "label": "routes",
+          "used": true,
+          "files": [
+            "apps/web-store/src/routes/health.ts",
+            "apps/web-store/src/routes/index.ts"
+          ]
+        }
+      ],
+      "fileCount": 3
+    },
+    {
+      "id": "auth/src",
+      "kind": "library",
+      "used": true,
+      "label": "auth",
+      "layers": [
+        {
+          "id": "auth/src/files",
+          "label": "files",
+          "used": true,
+          "files": [
+            "packages/auth/src/index.ts",
+            "packages/auth/src/util.ts"
+          ]
+        }
+      ],
+      "fileCount": 2
+    },
+    {
+      "id": "config/src",
+      "kind": "library",
+      "used": true,
+      "label": "config",
+      "layers": [
+        {
+          "id": "config/src/files",
+          "label": "files",
+          "used": true,
+          "files": [
+            "packages/config/src/index.ts",
+            "packages/config/src/util.ts"
+          ]
+        }
+      ],
+      "fileCount": 2
+    },
+    {
+      "id": "http-client/src",
+      "kind": "library",
+      "used": true,
+      "label": "http-client",
+      "layers": [
+        {
+          "id": "http-client/src/files",
+          "label": "files",
+          "used": true,
+          "files": [
+            "packages/http-client/src/index.ts",
+            "packages/http-client/src/util.ts"
+          ]
+        }
+      ],
+      "fileCount": 2
+    },
+    {
+      "id": "logger/src",
+      "kind": "library",
+      "used": true,
+      "label": "logger",
+      "layers": [
+        {
+          "id": "logger/src/files",
+          "label": "files",
+          "used": true,
+          "files": [
+            "packages/logger/src/index.ts",
+            "packages/logger/src/util.ts"
+          ]
+        }
+      ],
+      "fileCount": 2
+    },
+    {
+      "id": "queue-client/src",
+      "kind": "library",
+      "used": true,
+      "label": "queue-client",
+      "layers": [
+        {
+          "id": "queue-client/src/files",
+          "label": "files",
+          "used": true,
+          "files": [
+            "packages/queue-client/src/index.ts",
+            "packages/queue-client/src/util.ts"
+          ]
+        }
+      ],
+      "fileCount": 2
+    },
+    {
+      "id": "storage-client/src",
+      "kind": "library",
+      "used": true,
+      "label": "storage-client",
+      "layers": [
+        {
+          "id": "storage-client/src/files",
+          "label": "files",
+          "used": true,
+          "files": [
+            "packages/storage-client/src/index.ts",
+            "packages/storage-client/src/util.ts"
+          ]
+        }
+      ],
+      "fileCount": 2
+    },
+    {
+      "id": "types/src",
+      "kind": "library",
+      "used": true,
+      "label": "types",
+      "layers": [
+        {
+          "id": "types/src/files",
+          "label": "files",
+          "used": true,
+          "files": [
+            "packages/types/src/index.ts",
+            "packages/types/src/util.ts"
+          ]
+        }
+      ],
+      "fileCount": 2
+    },
+    {
+      "id": "ui-kit/src",
+      "kind": "library",
+      "used": true,
+      "label": "ui-kit",
+      "layers": [
+        {
+          "id": "ui-kit/src/files",
+          "label": "files",
+          "used": true,
+          "files": [
+            "packages/ui-kit/src/index.ts",
+            "packages/ui-kit/src/util.ts"
+          ]
+        }
+      ],
+      "fileCount": 2
+    },
+    {
+      "id": "analytics/events",
+      "kind": "layered",
+      "used": true,
+      "label": "analytics / events",
+      "layers": [
+        {
+          "id": "analytics/events/application",
+          "label": "application",
+          "used": true,
+          "files": [
+            "services/analytics/src/features/events/application/use-case.ts"
+          ]
+        },
+        {
+          "id": "analytics/events/domain",
+          "label": "domain",
+          "used": true,
+          "files": [
+            "services/analytics/src/features/events/domain/entity.ts",
+            "services/analytics/src/features/events/domain/policy.ts"
+          ]
+        },
+        {
+          "id": "analytics/events/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "files": [
+            "services/analytics/src/features/events/infrastructure/repo.ts"
+          ]
+        }
+      ],
+      "fileCount": 4
+    },
+    {
+      "id": "analytics/reports",
+      "kind": "layered",
+      "used": true,
+      "label": "analytics / reports",
+      "layers": [
+        {
+          "id": "analytics/reports/application",
+          "label": "application",
+          "used": true,
+          "files": [
+            "services/analytics/src/features/reports/application/use-case.ts"
+          ]
+        },
+        {
+          "id": "analytics/reports/domain",
+          "label": "domain",
+          "used": true,
+          "files": [
+            "services/analytics/src/features/reports/domain/entity.ts",
+            "services/analytics/src/features/reports/domain/policy.ts"
+          ]
+        },
+        {
+          "id": "analytics/reports/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "files": [
+            "services/analytics/src/features/reports/infrastructure/repo.ts"
+          ]
+        }
+      ],
+      "fileCount": 4
+    },
+    {
+      "id": "analytics/config",
+      "kind": "library",
+      "used": true,
+      "label": "analytics / config",
+      "layers": [
+        {
+          "id": "analytics/config/files",
+          "label": "files",
+          "used": true,
+          "files": [
+            "services/analytics/src/config/db.ts",
+            "services/analytics/src/config/env.ts"
+          ]
+        }
+      ],
+      "fileCount": 2
+    },
+    {
+      "id": "billing/invoices",
+      "kind": "layered",
+      "used": true,
+      "label": "billing / invoices",
+      "layers": [
+        {
+          "id": "billing/invoices/application",
+          "label": "application",
+          "used": true,
+          "files": [
+            "services/billing/src/features/invoices/application/use-case.ts"
+          ]
+        },
+        {
+          "id": "billing/invoices/domain",
+          "label": "domain",
+          "used": true,
+          "files": [
+            "services/billing/src/features/invoices/domain/entity.ts",
+            "services/billing/src/features/invoices/domain/policy.ts"
+          ]
+        },
+        {
+          "id": "billing/invoices/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "files": [
+            "services/billing/src/features/invoices/infrastructure/repo.ts"
+          ]
+        }
+      ],
+      "fileCount": 4
+    },
+    {
+      "id": "billing/subscriptions",
+      "kind": "layered",
+      "used": true,
+      "label": "billing / subscriptions",
+      "layers": [
+        {
+          "id": "billing/subscriptions/application",
+          "label": "application",
+          "used": true,
+          "files": [
+            "services/billing/src/features/subscriptions/application/use-case.ts"
+          ]
+        },
+        {
+          "id": "billing/subscriptions/domain",
+          "label": "domain",
+          "used": true,
+          "files": [
+            "services/billing/src/features/subscriptions/domain/entity.ts",
+            "services/billing/src/features/subscriptions/domain/policy.ts"
+          ]
+        },
+        {
+          "id": "billing/subscriptions/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "files": [
+            "services/billing/src/features/subscriptions/infrastructure/repo.ts"
+          ]
+        }
+      ],
+      "fileCount": 4
+    },
+    {
+      "id": "billing/config",
+      "kind": "library",
+      "used": true,
+      "label": "billing / config",
+      "layers": [
+        {
+          "id": "billing/config/files",
+          "label": "files",
+          "used": true,
+          "files": [
+            "services/billing/src/config/db.ts",
+            "services/billing/src/config/env.ts"
+          ]
+        }
+      ],
+      "fileCount": 2
+    },
+    {
+      "id": "catalog/categories",
+      "kind": "layered",
+      "used": true,
+      "label": "catalog / categories",
+      "layers": [
+        {
+          "id": "catalog/categories/application",
+          "label": "application",
+          "used": true,
+          "files": [
+            "services/catalog/src/features/categories/application/use-case.ts"
+          ]
+        },
+        {
+          "id": "catalog/categories/domain",
+          "label": "domain",
+          "used": true,
+          "files": [
+            "services/catalog/src/features/categories/domain/entity.ts",
+            "services/catalog/src/features/categories/domain/policy.ts"
+          ]
+        },
+        {
+          "id": "catalog/categories/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "files": [
+            "services/catalog/src/features/categories/infrastructure/repo.ts"
+          ]
+        }
+      ],
+      "fileCount": 4
+    },
+    {
+      "id": "catalog/products",
+      "kind": "layered",
+      "used": true,
+      "label": "catalog / products",
+      "layers": [
+        {
+          "id": "catalog/products/application",
+          "label": "application",
+          "used": true,
+          "files": [
+            "services/catalog/src/features/products/application/use-case.ts"
+          ]
+        },
+        {
+          "id": "catalog/products/domain",
+          "label": "domain",
+          "used": true,
+          "files": [
+            "services/catalog/src/features/products/domain/entity.ts",
+            "services/catalog/src/features/products/domain/policy.ts"
+          ]
+        },
+        {
+          "id": "catalog/products/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "files": [
+            "services/catalog/src/features/products/infrastructure/repo.ts"
+          ]
+        }
+      ],
+      "fileCount": 4
+    },
+    {
+      "id": "catalog/config",
+      "kind": "library",
+      "used": true,
+      "label": "catalog / config",
+      "layers": [
+        {
+          "id": "catalog/config/files",
+          "label": "files",
+          "used": true,
+          "files": [
+            "services/catalog/src/config/db.ts",
+            "services/catalog/src/config/env.ts"
+          ]
+        }
+      ],
+      "fileCount": 2
+    },
+    {
+      "id": "inventory/stock",
+      "kind": "layered",
+      "used": true,
+      "label": "inventory / stock",
+      "layers": [
+        {
+          "id": "inventory/stock/application",
+          "label": "application",
+          "used": true,
+          "files": [
+            "services/inventory/src/features/stock/application/use-case.ts"
+          ]
+        },
+        {
+          "id": "inventory/stock/domain",
+          "label": "domain",
+          "used": true,
+          "files": [
+            "services/inventory/src/features/stock/domain/entity.ts",
+            "services/inventory/src/features/stock/domain/policy.ts"
+          ]
+        },
+        {
+          "id": "inventory/stock/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "files": [
+            "services/inventory/src/features/stock/infrastructure/repo.ts"
+          ]
+        }
+      ],
+      "fileCount": 4
+    },
+    {
+      "id": "inventory/warehouses",
+      "kind": "layered",
+      "used": true,
+      "label": "inventory / warehouses",
+      "layers": [
+        {
+          "id": "inventory/warehouses/application",
+          "label": "application",
+          "used": true,
+          "files": [
+            "services/inventory/src/features/warehouses/application/use-case.ts"
+          ]
+        },
+        {
+          "id": "inventory/warehouses/domain",
+          "label": "domain",
+          "used": true,
+          "files": [
+            "services/inventory/src/features/warehouses/domain/entity.ts",
+            "services/inventory/src/features/warehouses/domain/policy.ts"
+          ]
+        },
+        {
+          "id": "inventory/warehouses/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "files": [
+            "services/inventory/src/features/warehouses/infrastructure/repo.ts"
+          ]
+        }
+      ],
+      "fileCount": 4
+    },
+    {
+      "id": "inventory/config",
+      "kind": "library",
+      "used": true,
+      "label": "inventory / config",
+      "layers": [
+        {
+          "id": "inventory/config/files",
+          "label": "files",
+          "used": true,
+          "files": [
+            "services/inventory/src/config/db.ts",
+            "services/inventory/src/config/env.ts"
+          ]
+        }
+      ],
+      "fileCount": 2
+    },
+    {
+      "id": "notifications/email",
+      "kind": "layered",
+      "used": true,
+      "label": "notifications / email",
+      "layers": [
+        {
+          "id": "notifications/email/application",
+          "label": "application",
+          "used": true,
+          "files": [
+            "services/notifications/src/features/email/application/use-case.ts"
+          ]
+        },
+        {
+          "id": "notifications/email/domain",
+          "label": "domain",
+          "used": true,
+          "files": [
+            "services/notifications/src/features/email/domain/entity.ts",
+            "services/notifications/src/features/email/domain/policy.ts"
+          ]
+        },
+        {
+          "id": "notifications/email/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "files": [
+            "services/notifications/src/features/email/infrastructure/repo.ts"
+          ]
+        }
+      ],
+      "fileCount": 4
+    },
+    {
+      "id": "notifications/push",
+      "kind": "layered",
+      "used": true,
+      "label": "notifications / push",
+      "layers": [
+        {
+          "id": "notifications/push/application",
+          "label": "application",
+          "used": true,
+          "files": [
+            "services/notifications/src/features/push/application/use-case.ts"
+          ]
+        },
+        {
+          "id": "notifications/push/domain",
+          "label": "domain",
+          "used": true,
+          "files": [
+            "services/notifications/src/features/push/domain/entity.ts",
+            "services/notifications/src/features/push/domain/policy.ts"
+          ]
+        },
+        {
+          "id": "notifications/push/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "files": [
+            "services/notifications/src/features/push/infrastructure/repo.ts"
+          ]
+        }
+      ],
+      "fileCount": 4
+    },
+    {
+      "id": "notifications/sms",
+      "kind": "layered",
+      "used": true,
+      "label": "notifications / sms",
+      "layers": [
+        {
+          "id": "notifications/sms/application",
+          "label": "application",
+          "used": true,
+          "files": [
+            "services/notifications/src/features/sms/application/use-case.ts"
+          ]
+        },
+        {
+          "id": "notifications/sms/domain",
+          "label": "domain",
+          "used": true,
+          "files": [
+            "services/notifications/src/features/sms/domain/entity.ts",
+            "services/notifications/src/features/sms/domain/policy.ts"
+          ]
+        },
+        {
+          "id": "notifications/sms/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "files": [
+            "services/notifications/src/features/sms/infrastructure/repo.ts"
+          ]
+        }
+      ],
+      "fileCount": 4
+    },
+    {
+      "id": "notifications/config",
+      "kind": "library",
+      "used": true,
+      "label": "notifications / config",
+      "layers": [
+        {
+          "id": "notifications/config/files",
+          "label": "files",
+          "used": true,
+          "files": [
+            "services/notifications/src/config/db.ts",
+            "services/notifications/src/config/env.ts"
+          ]
+        }
+      ],
+      "fileCount": 2
+    },
+    {
+      "id": "orders/cart",
+      "kind": "layered",
+      "used": true,
+      "label": "orders / cart",
+      "layers": [
+        {
+          "id": "orders/cart/application",
+          "label": "application",
+          "used": true,
+          "files": [
+            "services/orders/src/features/cart/application/use-case.ts"
+          ]
+        },
+        {
+          "id": "orders/cart/domain",
+          "label": "domain",
+          "used": true,
+          "files": [
+            "services/orders/src/features/cart/domain/entity.ts",
+            "services/orders/src/features/cart/domain/policy.ts"
+          ]
+        },
+        {
+          "id": "orders/cart/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "files": [
+            "services/orders/src/features/cart/infrastructure/repo.ts"
+          ]
+        }
+      ],
+      "fileCount": 4
+    },
+    {
+      "id": "orders/checkout",
+      "kind": "layered",
+      "used": true,
+      "label": "orders / checkout",
+      "layers": [
+        {
+          "id": "orders/checkout/application",
+          "label": "application",
+          "used": true,
+          "files": [
+            "services/orders/src/features/checkout/application/use-case.ts"
+          ]
+        },
+        {
+          "id": "orders/checkout/domain",
+          "label": "domain",
+          "used": true,
+          "files": [
+            "services/orders/src/features/checkout/domain/entity.ts",
+            "services/orders/src/features/checkout/domain/policy.ts"
+          ]
+        },
+        {
+          "id": "orders/checkout/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "files": [
+            "services/orders/src/features/checkout/infrastructure/repo.ts"
+          ]
+        }
+      ],
+      "fileCount": 4
+    },
+    {
+      "id": "orders/history",
+      "kind": "layered",
+      "used": true,
+      "label": "orders / history",
+      "layers": [
+        {
+          "id": "orders/history/application",
+          "label": "application",
+          "used": true,
+          "files": [
+            "services/orders/src/features/history/application/use-case.ts"
+          ]
+        },
+        {
+          "id": "orders/history/domain",
+          "label": "domain",
+          "used": true,
+          "files": [
+            "services/orders/src/features/history/domain/entity.ts",
+            "services/orders/src/features/history/domain/policy.ts"
+          ]
+        },
+        {
+          "id": "orders/history/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "files": [
+            "services/orders/src/features/history/infrastructure/repo.ts"
+          ]
+        }
+      ],
+      "fileCount": 4
+    },
+    {
+      "id": "orders/config",
+      "kind": "library",
+      "used": true,
+      "label": "orders / config",
+      "layers": [
+        {
+          "id": "orders/config/files",
+          "label": "files",
+          "used": true,
+          "files": [
+            "services/orders/src/config/db.ts",
+            "services/orders/src/config/env.ts"
+          ]
+        }
+      ],
+      "fileCount": 2
+    },
+    {
+      "id": "payments/cards",
+      "kind": "layered",
+      "used": true,
+      "label": "payments / cards",
+      "layers": [
+        {
+          "id": "payments/cards/application",
+          "label": "application",
+          "used": true,
+          "files": [
+            "services/payments/src/features/cards/application/use-case.ts"
+          ]
+        },
+        {
+          "id": "payments/cards/domain",
+          "label": "domain",
+          "used": true,
+          "files": [
+            "services/payments/src/features/cards/domain/entity.ts",
+            "services/payments/src/features/cards/domain/policy.ts"
+          ]
+        },
+        {
+          "id": "payments/cards/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "files": [
+            "services/payments/src/features/cards/infrastructure/repo.ts"
+          ]
+        }
+      ],
+      "fileCount": 4
+    },
+    {
+      "id": "payments/refunds",
+      "kind": "layered",
+      "used": true,
+      "label": "payments / refunds",
+      "layers": [
+        {
+          "id": "payments/refunds/application",
+          "label": "application",
+          "used": true,
+          "files": [
+            "services/payments/src/features/refunds/application/use-case.ts"
+          ]
+        },
+        {
+          "id": "payments/refunds/domain",
+          "label": "domain",
+          "used": true,
+          "files": [
+            "services/payments/src/features/refunds/domain/entity.ts",
+            "services/payments/src/features/refunds/domain/policy.ts"
+          ]
+        },
+        {
+          "id": "payments/refunds/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "files": [
+            "services/payments/src/features/refunds/infrastructure/repo.ts"
+          ]
+        }
+      ],
+      "fileCount": 4
+    },
+    {
+      "id": "payments/config",
+      "kind": "library",
+      "used": true,
+      "label": "payments / config",
+      "layers": [
+        {
+          "id": "payments/config/files",
+          "label": "files",
+          "used": true,
+          "files": [
+            "services/payments/src/config/db.ts",
+            "services/payments/src/config/env.ts"
+          ]
+        }
+      ],
+      "fileCount": 2
+    },
+    {
+      "id": "recommendations/ranking",
+      "kind": "layered",
+      "used": true,
+      "label": "recommendations / ranking",
+      "layers": [
+        {
+          "id": "recommendations/ranking/application",
+          "label": "application",
+          "used": true,
+          "files": [
+            "services/recommendations/src/features/ranking/application/use-case.ts"
+          ]
+        },
+        {
+          "id": "recommendations/ranking/domain",
+          "label": "domain",
+          "used": true,
+          "files": [
+            "services/recommendations/src/features/ranking/domain/entity.ts",
+            "services/recommendations/src/features/ranking/domain/policy.ts"
+          ]
+        },
+        {
+          "id": "recommendations/ranking/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "files": [
+            "services/recommendations/src/features/ranking/infrastructure/repo.ts"
+          ]
+        }
+      ],
+      "fileCount": 4
+    },
+    {
+      "id": "recommendations/config",
+      "kind": "library",
+      "used": true,
+      "label": "recommendations / config",
+      "layers": [
+        {
+          "id": "recommendations/config/files",
+          "label": "files",
+          "used": true,
+          "files": [
+            "services/recommendations/src/config/db.ts",
+            "services/recommendations/src/config/env.ts"
+          ]
+        }
+      ],
+      "fileCount": 2
+    },
+    {
+      "id": "search/query",
+      "kind": "layered",
+      "used": true,
+      "label": "search / query",
+      "layers": [
+        {
+          "id": "search/query/application",
+          "label": "application",
+          "used": true,
+          "files": [
+            "services/search/src/features/query/application/use-case.ts"
+          ]
+        },
+        {
+          "id": "search/query/domain",
+          "label": "domain",
+          "used": true,
+          "files": [
+            "services/search/src/features/query/domain/entity.ts",
+            "services/search/src/features/query/domain/policy.ts"
+          ]
+        },
+        {
+          "id": "search/query/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "files": [
+            "services/search/src/features/query/infrastructure/repo.ts"
+          ]
+        }
+      ],
+      "fileCount": 4
+    },
+    {
+      "id": "search/config",
+      "kind": "library",
+      "used": true,
+      "label": "search / config",
+      "layers": [
+        {
+          "id": "search/config/files",
+          "label": "files",
+          "used": true,
+          "files": [
+            "services/search/src/config/db.ts",
+            "services/search/src/config/env.ts"
+          ]
+        }
+      ],
+      "fileCount": 2
+    },
+    {
+      "id": "shipping/labels",
+      "kind": "layered",
+      "used": true,
+      "label": "shipping / labels",
+      "layers": [
+        {
+          "id": "shipping/labels/application",
+          "label": "application",
+          "used": true,
+          "files": [
+            "services/shipping/src/features/labels/application/use-case.ts"
+          ]
+        },
+        {
+          "id": "shipping/labels/domain",
+          "label": "domain",
+          "used": true,
+          "files": [
+            "services/shipping/src/features/labels/domain/entity.ts",
+            "services/shipping/src/features/labels/domain/policy.ts"
+          ]
+        },
+        {
+          "id": "shipping/labels/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "files": [
+            "services/shipping/src/features/labels/infrastructure/repo.ts"
+          ]
+        }
+      ],
+      "fileCount": 4
+    },
+    {
+      "id": "shipping/rates",
+      "kind": "layered",
+      "used": true,
+      "label": "shipping / rates",
+      "layers": [
+        {
+          "id": "shipping/rates/application",
+          "label": "application",
+          "used": true,
+          "files": [
+            "services/shipping/src/features/rates/application/use-case.ts"
+          ]
+        },
+        {
+          "id": "shipping/rates/domain",
+          "label": "domain",
+          "used": true,
+          "files": [
+            "services/shipping/src/features/rates/domain/entity.ts",
+            "services/shipping/src/features/rates/domain/policy.ts"
+          ]
+        },
+        {
+          "id": "shipping/rates/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "files": [
+            "services/shipping/src/features/rates/infrastructure/repo.ts"
+          ]
+        }
+      ],
+      "fileCount": 4
+    },
+    {
+      "id": "shipping/tracking",
+      "kind": "layered",
+      "used": true,
+      "label": "shipping / tracking",
+      "layers": [
+        {
+          "id": "shipping/tracking/application",
+          "label": "application",
+          "used": true,
+          "files": [
+            "services/shipping/src/features/tracking/application/use-case.ts"
+          ]
+        },
+        {
+          "id": "shipping/tracking/domain",
+          "label": "domain",
+          "used": true,
+          "files": [
+            "services/shipping/src/features/tracking/domain/entity.ts",
+            "services/shipping/src/features/tracking/domain/policy.ts"
+          ]
+        },
+        {
+          "id": "shipping/tracking/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "files": [
+            "services/shipping/src/features/tracking/infrastructure/repo.ts"
+          ]
+        }
+      ],
+      "fileCount": 4
+    },
+    {
+      "id": "shipping/config",
+      "kind": "library",
+      "used": true,
+      "label": "shipping / config",
+      "layers": [
+        {
+          "id": "shipping/config/files",
+          "label": "files",
+          "used": true,
+          "files": [
+            "services/shipping/src/config/db.ts",
+            "services/shipping/src/config/env.ts"
+          ]
+        }
+      ],
+      "fileCount": 2
+    },
+    {
+      "id": "worker-jobs/scheduler",
+      "kind": "layered",
+      "used": true,
+      "label": "worker-jobs / scheduler",
+      "layers": [
+        {
+          "id": "worker-jobs/scheduler/application",
+          "label": "application",
+          "used": true,
+          "files": [
+            "services/worker-jobs/src/features/scheduler/application/use-case.ts"
+          ]
+        },
+        {
+          "id": "worker-jobs/scheduler/domain",
+          "label": "domain",
+          "used": true,
+          "files": [
+            "services/worker-jobs/src/features/scheduler/domain/entity.ts",
+            "services/worker-jobs/src/features/scheduler/domain/policy.ts"
+          ]
+        },
+        {
+          "id": "worker-jobs/scheduler/infrastructure",
+          "label": "infrastructure",
+          "used": true,
+          "files": [
+            "services/worker-jobs/src/features/scheduler/infrastructure/repo.ts"
+          ]
+        }
+      ],
+      "fileCount": 4
+    },
+    {
+      "id": "worker-jobs/config",
+      "kind": "library",
+      "used": true,
+      "label": "worker-jobs / config",
+      "layers": [
+        {
+          "id": "worker-jobs/config/files",
+          "label": "files",
+          "used": true,
+          "files": [
+            "services/worker-jobs/src/config/db.ts",
+            "services/worker-jobs/src/config/env.ts"
+          ]
+        }
+      ],
+      "fileCount": 2
+    }
+  ],
+  "hops": [],
+  "findings": [
+    {
+      "id": "minio-unreferenced",
+      "severity": "info",
+      "title": "minio runs in compose but no source file names it",
+      "detail": "Neither the service id nor its container name appears in any code or config file outside compose. It may be reached through a URL in the environment, or it may be unused.",
+      "nodeId": "minio"
+    },
+    {
+      "id": "prometheus-unreferenced",
+      "severity": "info",
+      "title": "prometheus runs in compose but no source file names it",
+      "detail": "Neither the service id nor its container name appears in any code or config file outside compose. It may be reached through a URL in the environment, or it may be unused.",
+      "nodeId": "prometheus"
+    },
+    {
+      "id": "grafana-unreferenced",
+      "severity": "info",
+      "title": "grafana runs in compose but no source file names it",
+      "detail": "Neither the service id nor its container name appears in any code or config file outside compose. It may be reached through a URL in the environment, or it may be unused.",
+      "nodeId": "grafana"
+    }
+  ],
+  "grounding": [
+    {
+      "id": "compose",
+      "path": "infra/compose.yaml"
+    },
+    {
+      "id": "workspace",
+      "path": "package.json"
+    },
+    {
+      "id": "api-gateway-manifest",
+      "path": "apps/api-gateway/package.json"
+    },
+    {
+      "id": "api-gateway-dockerfile",
+      "path": "apps/api-gateway/Dockerfile"
+    },
+    {
+      "id": "web-admin-manifest",
+      "path": "apps/web-admin/package.json"
+    },
+    {
+      "id": "web-admin-dockerfile",
+      "path": "apps/web-admin/Dockerfile"
+    },
+    {
+      "id": "web-store-manifest",
+      "path": "apps/web-store/package.json"
+    },
+    {
+      "id": "web-store-dockerfile",
+      "path": "apps/web-store/Dockerfile"
+    },
+    {
+      "id": "auth-manifest",
+      "path": "packages/auth/package.json"
+    },
+    {
+      "id": "config-manifest",
+      "path": "packages/config/package.json"
+    },
+    {
+      "id": "http-client-manifest",
+      "path": "packages/http-client/package.json"
+    },
+    {
+      "id": "logger-manifest",
+      "path": "packages/logger/package.json"
+    },
+    {
+      "id": "queue-client-manifest",
+      "path": "packages/queue-client/package.json"
+    },
+    {
+      "id": "storage-client-manifest",
+      "path": "packages/storage-client/package.json"
+    },
+    {
+      "id": "types-manifest",
+      "path": "packages/types/package.json"
+    },
+    {
+      "id": "ui-kit-manifest",
+      "path": "packages/ui-kit/package.json"
+    },
+    {
+      "id": "analytics-manifest",
+      "path": "services/analytics/package.json"
+    },
+    {
+      "id": "analytics-dockerfile",
+      "path": "services/analytics/Dockerfile"
+    },
+    {
+      "id": "billing-manifest",
+      "path": "services/billing/package.json"
+    },
+    {
+      "id": "billing-dockerfile",
+      "path": "services/billing/Dockerfile"
+    },
+    {
+      "id": "catalog-manifest",
+      "path": "services/catalog/package.json"
+    },
+    {
+      "id": "catalog-dockerfile",
+      "path": "services/catalog/Dockerfile"
+    },
+    {
+      "id": "inventory-manifest",
+      "path": "services/inventory/package.json"
+    },
+    {
+      "id": "inventory-dockerfile",
+      "path": "services/inventory/Dockerfile"
+    },
+    {
+      "id": "notifications-manifest",
+      "path": "services/notifications/package.json"
+    },
+    {
+      "id": "notifications-dockerfile",
+      "path": "services/notifications/Dockerfile"
+    },
+    {
+      "id": "orders-manifest",
+      "path": "services/orders/package.json"
+    },
+    {
+      "id": "orders-dockerfile",
+      "path": "services/orders/Dockerfile"
+    },
+    {
+      "id": "payments-manifest",
+      "path": "services/payments/package.json"
+    },
+    {
+      "id": "payments-dockerfile",
+      "path": "services/payments/Dockerfile"
+    },
+    {
+      "id": "recommendations-manifest",
+      "path": "services/recommendations/package.json"
+    },
+    {
+      "id": "recommendations-dockerfile",
+      "path": "services/recommendations/Dockerfile"
+    },
+    {
+      "id": "search-manifest",
+      "path": "services/search/package.json"
+    },
+    {
+      "id": "search-dockerfile",
+      "path": "services/search/Dockerfile"
+    },
+    {
+      "id": "shipping-manifest",
+      "path": "services/shipping/package.json"
+    },
+    {
+      "id": "shipping-dockerfile",
+      "path": "services/shipping/Dockerfile"
+    },
+    {
+      "id": "worker-jobs-manifest",
+      "path": "services/worker-jobs/package.json"
+    },
+    {
+      "id": "worker-jobs-dockerfile",
+      "path": "services/worker-jobs/Dockerfile"
+    }
+  ],
+  "unknown": [],
+  "repoStats": {
+    "units": 22,
+    "features": 22,
+    "layers": 91,
+    "files": 135,
+    "infra": 6,
+    "processes": 14
+  }
+}

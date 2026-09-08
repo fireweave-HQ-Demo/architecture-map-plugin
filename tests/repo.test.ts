@@ -27,6 +27,26 @@ describe('draftRepoMap on the sample repo', () => {
     expect(draft.schemaVersion).toBe(1);
   });
 
+  test('populates repoStats and per-column fileCount for the shell', () => {
+    // Every column carries a non-negative integer file count.
+    for (const col of draft.columns) {
+      expect(typeof col.fileCount).toBe('number');
+      expect(col.fileCount!).toBeGreaterThanOrEqual(0);
+      expect(Number.isInteger(col.fileCount)).toBe(true);
+    }
+    expect(draft.repoStats).toBeDefined();
+    expect(draft.repoStats!.units).toBe(inv.units.length);
+    expect(draft.repoStats!.features).toBe(inv.features.length);
+    expect(draft.repoStats!.infra).toBe(draft.infra.length);
+    expect(draft.repoStats!.processes).toBe(draft.processes.length);
+    expect(draft.repoStats!.layers).toBe(
+      draft.columns.reduce((sum, col) => sum + col.layers.length, 0)
+    );
+    expect(draft.repoStats!.files).toBe(
+      draft.columns.reduce((sum, col) => sum + (col.fileCount ?? 0), 0)
+    );
+  });
+
   test('names the repo from the root manifest and says where it read from', () => {
     expect(draft.title).toBe('sample-shop — repository surface');
     expect(draft.query.name).toBe('sample-shop');

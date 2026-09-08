@@ -24,6 +24,7 @@ import {
   type MapGrounding,
   type MapLayer,
   type MapNodeUse,
+  type RepoStats,
 } from '../schema';
 
 export interface DraftRepoOptions {
@@ -70,6 +71,41 @@ function listDirs(p: string): string[] {
 function rel(root: string, abs: string): string {
   const r = relative(root, abs).split('\\').join('/');
   return r === '' ? '.' : r;
+}
+
+/**
+ * Non-test file count under `dir` with the same ignore rules as
+ * `representativeFiles`. The result feeds `MapColumn.fileCount` so the
+ * shell can size a treemap tile without re-walking the tree at render
+ * time. Depth-capped and count-capped so a monorepo unit cannot stall
+ * the drafter; the cap is deliberately generous (10k) so real units
+ * fit inside it and the returned number stays meaningful.
+ */
+const MAX_FILES_PER_UNIT = 10_000;
+
+function countFiles(root: string, dir: string): number {
+  let total = 0;
+  const walk = (d: string, depth: number) => {
+    if (depth > 8 || total > MAX_FILES_PER_UNIT) return;
+    let entries: Dirent[];
+    try {
+      entries = readdirSync(d, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const e of entries) {
+      if (total > MAX_FILES_PER_UNIT) return;
+      const abs = join(d, e.name);
+      if (e.isDirectory()) {
+        if (!IGNORED_DIRS.has(e.name) && !e.name.startsWith('.')) walk(abs, depth + 1);
+      } else if (e.isFile()) {
+        const r = rel(root, abs);
+        if (!TEST_PATH.test('/' + r) && !e.name.startsWith('.')) total += 1;
+      }
+    }
+  };
+  walk(dir, 0);
+  return total;
 }
 
 /** Files under `dir`, shallow first, tests skipped, capped for the layer. */
@@ -156,12 +192,14 @@ function featureColumn(
   const id = `${unit.id}/${feature.name}`;
   const layered =
     feature.layers.domain || feature.layers.application || feature.layers.infrastructure;
+  const dirAbs = join(root, feature.path);
   return {
     id,
     kind: layered ? 'layered' : 'unknown',
     used: true,
     label: `${unit.id} / ${feature.name}`,
-    layers: layersFor(root, id, join(root, feature.path), overflow),
+    layers: layersFor(root, id, dirAbs, overflow),
+    fileCount: countFiles(root, dirAbs),
   };
 }
 
@@ -179,6 +217,7 @@ function supportColumn(
     used: true,
     label: `${unit.id} / ${dirName}`,
     layers: layersFor(root, id, dirAbs, overflow),
+    fileCount: countFiles(root, dirAbs),
   };
 }
 
@@ -190,12 +229,14 @@ function wholeUnitColumn(
   const abs = unitAbs(root, unit);
   const src = sourceRoot(abs);
   const id = `${unit.id}/${src === '.' ? 'root' : src}`;
+  const dirAbs = src === '.' ? abs : join(abs, src);
   return {
     id,
     kind: unit.layout,
     used: true,
     label: unit.id,
-    layers: layersFor(root, id, src === '.' ? abs : join(abs, src), overflow),
+    layers: layersFor(root, id, dirAbs, overflow),
+    fileCount: countFiles(root, dirAbs),
   };
 }
 
@@ -349,6 +390,15 @@ export function draftRepoMap(inv: Inventory, opts: DraftRepoOptions = {}): MapDo
     : 'no compose file';
   const manifestCount = inv.units.filter((u) => u.manifest).length;
 
+  const repoStats: RepoStats = {
+    units: inv.units.length,
+    features: inv.features.length,
+    layers: columns.reduce((sum, col) => sum + col.layers.length, 0),
+    files: columns.reduce((sum, col) => sum + (col.fileCount ?? 0), 0),
+    infra: infra.length,
+    processes: processes.length,
+  };
+
   return {
     schemaVersion: SCHEMA_VERSION,
     title: `${name} — repository surface`,
@@ -364,5 +414,6 @@ export function draftRepoMap(inv: Inventory, opts: DraftRepoOptions = {}): MapDo
     findings,
     grounding,
     unknown: [],
+    repoStats,
   };
 }

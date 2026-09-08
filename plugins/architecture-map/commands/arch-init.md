@@ -40,7 +40,10 @@ Arguments: `$ARGUMENTS` — optional `--name <title>`, one or more
    ```
 
 5. Reply with: one sentence on what the surface shows, the HTML path, the
-   findings worth reading, and that the page is interactive (click a box for
-   its files; run `/arch-flow <name>` to trace a path through it).
+   findings worth reading, and that the page is interactive — unit cards
+   collapse until clicked, `⌘K` focuses a search input, the **Map** toggle
+   swaps to a treemap sized by file count, and any deep link of the form
+   `.../repo.html#node=<unit>/<column>` opens the ancestor cards so the
+   target is in view. Run `/arch-flow <name>` to trace a path through it.
 
 Do not draw hops here. The surface has none.

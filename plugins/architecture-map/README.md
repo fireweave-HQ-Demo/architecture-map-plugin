@@ -24,6 +24,10 @@ code unit and feature as boxes with their files. Drafted mechanically
 from inventory; nothing invented; no hops. Run this first, or after the
 layout changed. Optional `--name <title>`, `--compose <file>` (pick a
 stack when several exist), `--out-dir` (default `.architecture-map/`).
+The rendered page opens compact even on a 50-unit monorepo: unit
+cards are collapsed by default, a top toolbar carries a search input
+(`⌘K`) plus a **List ↔ Map** toggle (map is a treemap sized by file
+count), and any conflict finding rides above the fold.
 
 **`/arch-flow <name>`** (`flow`) — how this path runs today. Trace from
 the entry (route, page, CLI, consumer, cron) through the code, ≤ 12

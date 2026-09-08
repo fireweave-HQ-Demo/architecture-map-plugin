@@ -132,8 +132,10 @@ hops and PR statuses never appear on plan hops.
    - `work` is plain language; identifiers stay in `label` / `source`.
 10. **Chat.** Short. The HTML is the deliverable.
     - `repo`: one sentence on what the surface shows, the HTML path, the
-      findings worth reading. Say the page is interactive (click a box for
-      its files).
+      findings worth reading. Say the page is interactive: click a unit to
+      open it, use the search input (⌘K) to jump, or switch to Map for a
+      treemap sized by file count. Any `#node=…` deep link auto-expands
+      the ancestor unit.
     - `flow`: one-sentence intent, HTML path, numbered hop titles. No
       tutorial — the inspector carries each step's full brief.
     - `plan`: **verdict**, HTML path, findings (conflicts first), hop titles

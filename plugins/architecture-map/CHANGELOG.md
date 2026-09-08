@@ -8,6 +8,38 @@ time by [`.github/workflows/publish.yml`](../../.github/workflows/publish.yml).
 
 ## Unreleased
 
+## 1.4.0
+
+Repo mode renders as a progressive-disclosure browser instead of a wall
+of columns, so `init` on a real monorepo produces an HTML you can
+actually read.
+
+- **Optional `RepoStats` on `MapDocument` and `fileCount` on `MapColumn`**
+  (schema-additive, backward compatible). `draftRepoMap` populates both;
+  every existing repo-mode fixture keeps validating without them.
+- **Shell fork on `map.query.mode === 'repo'`.** The stats-chip row,
+  a repo toolbar (search input, list/map toggle, only-unused, dense),
+  unit-grouped `<details>` cards (closed by default), a treemap view
+  sized by `fileCount`, and a findings dock that sorts `conflict` →
+  `proposed` → `info` and opens by default when any conflict is present.
+  Every unit and column still exposes `data-node`, so click handlers,
+  keyboard nav, the inspector and existing deep-links keep working.
+- **Repo URL scheme.** Hash is now
+  `#view=map|list&node=<id>&search=<q>&unused=1&dense=1`; loading a
+  `#node=…` auto-expands the ancestor unit and column so the target
+  is in view without a manual click. `⌘K` / `Ctrl+K` focuses the
+  search input.
+- **`applyHash` runs before the first `render`** so a deep link takes
+  effect on the initial paint, not the second one.
+- **New `tests/fixtures/repo-large.map.json`** (22 units, 44 columns,
+  135 files, generated from a synthetic monorepo) exercises the
+  progressive-disclosure UX end-to-end in `browser.test.ts`.
+- **12 new browser tests + 2 schema tests + 1 drafter test** —
+  everything below the JSON contract is now anchored by tests.
+
+Other flow / plan / PR modes are byte-identical to `1.3.0`; only
+repo-mode paint has changed.
+
 ## 1.3.0
 
 Release engineering: the git tag is now the sole source of truth for the

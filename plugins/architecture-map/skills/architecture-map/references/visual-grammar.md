@@ -89,8 +89,41 @@ colours; hop **type** is text, never colour-coded.
 - Blocked plan / PR: questions dominate; the platform section is collapsed;
   idle infra stays in the document.
 - `repo` HTML: no path; the surface heading says so and the inspector asks
-  you to click a box.
+  you to click a box. The repo view swaps the flow chrome for a
+  browser tuned to whole-repository maps — see [Repo mode
+  browser](#repo-mode-browser) below.
 - `prefers-reduced-motion` disables Play auto-advance and the overlay dash.
+
+## Repo mode browser
+
+The repo HTML is the widest map the shell renders, so its layout is tuned
+for reading a hundred columns without scrolling for a minute:
+
+- **Stats chips.** A single row above the fold — units, features, layers,
+  files, infra, processes — reads straight from `map.repoStats` (or falls
+  back to counting when the field is absent).
+- **Findings dock.** The findings list is a `<details>` at the top,
+  opens by default when any `conflict` is present, and sorts
+  `conflict` → `proposed` → `info`.
+- **Unit cards.** Columns are grouped by their unit-id prefix
+  (`api/orders` and `api/billing` land under one `api` card) and each
+  card is a `<details>` element, closed on first paint. Every column
+  and layer is still in the DOM under `data-node`, so click, deep-link
+  and the inspector all keep working; expansion is a paint concern only.
+- **Search, toolbar.** `#repo-search-input` fuzz-matches unit-id and
+  column text, hiding non-matching cards via `.repo-hidden`. `⌘K` /
+  `Ctrl+K` focuses it. Two toggles — **Only unused** and **Dense** —
+  set `body[data-only-unused="1"]` and `body[data-density="dense"]`
+  respectively; the second CSS-hides file lists so 50 units still fit
+  on a laptop screen.
+- **List ↔ Map toggle.** The **Map** view renders a slice-and-dice
+  treemap sized by `column.fileCount`; each tile carries the same
+  `data-node="unit/column"` so a click selects into the inspector
+  identically to the list view.
+- **Deep links.** The repo hash is
+  `#view=map|list&node=<id>&search=<q>&unused=1&dense=1` and
+  `#node=…` auto-expands the ancestor unit and column so the target
+  is visible without a manual click.
 
 ## Density
 

@@ -115,9 +115,11 @@ describe('plugin manifests', () => {
   });
 
   test('source manifests carry the sentinel version (real versions are stamped from the tag)', () => {
-    // Reads the files off disk fresh — the module-level `claude` capture
-    // above still reflects source too, but we assert this loudly to keep
-    // the invariant visible to anyone editing the manifests by hand.
+    // Only enforced in source. `tools/stamp-version.ts --from-tag` deliberately
+    // rewrites all three to a real semver on tag push, and CI re-runs this suite
+    // against that stamped tree — the sentinel invariant is expected to be
+    // broken there, so we skip and let the version-parity test carry the load.
+    if (claude.version !== SENTINEL_VERSION) return;
     const paths = [
       join(REPO_ROOT, 'package.json'),
       join(REPO_ROOT, 'plugins/architecture-map/.claude-plugin/plugin.json'),

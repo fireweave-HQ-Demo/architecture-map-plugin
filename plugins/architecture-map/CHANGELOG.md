@@ -1,5 +1,35 @@
 # Changelog
 
+Ongoing work goes under `## Unreleased`. When a release is cut, that
+heading is renamed to the new version by hand in the same commit that gets
+tagged. Manifest versions are **never** hand-edited — they carry the
+sentinel `0.0.0-dev` in source and get stamped from the git tag at publish
+time by [`.github/workflows/publish.yml`](../../.github/workflows/publish.yml).
+
+## Unreleased
+
+## 1.3.0
+
+Release engineering: the git tag is now the sole source of truth for the
+plugin version. No user-visible behavior change from `1.2.0`.
+
+- **Source manifests carry the sentinel `0.0.0-dev`** in `package.json`,
+  the Claude Code plugin manifest, and the skill frontmatter. The Cursor
+  manifest is derived from Claude, so it inherits the sentinel through
+  `bun run sync`.
+- **New `tools/stamp-version.ts`** writes a semver into every manifest.
+  `bun tools/stamp-version.ts --version 1.3.0` locally, or
+  `bun tools/stamp-version.ts --from-tag` in CI (reads `$GITHUB_REF_NAME`).
+  Idempotent; `--check` fails 1 on drift.
+- **New publish workflow** (`.github/workflows/publish.yml`) fires on
+  `v*` tag push: stamps → regenerates Cursor manifests → runs the full
+  check gate against the stamped tree → creates a GitHub Release with
+  auto-generated notes.
+- **Release checklist collapses to one command.** No more editing four
+  files in lockstep before every tag; the old hygiene test that enforced
+  "all four version fields match" is replaced by an assertion that they
+  are all the sentinel in source.
+
 ## 1.2.0
 
 Runtime folder regroup; no behavior change. The map contract, the CLI

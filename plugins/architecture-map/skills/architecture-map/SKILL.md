@@ -10,7 +10,7 @@ description: >-
   questions instead of guessing. Not for authoring designs or writing docs.
 metadata:
   author: Architecture Map contributors
-  version: 1.2.0
+  version: 0.0.0-dev
 ---
 
 # Architecture map

@@ -1,6 +1,6 @@
 {
   "name": "architecture-map-plugin",
-  "version": "1.2.0",
+  "version": "0.0.0-dev",
   "private": true,
   "description": "Marketplace repository for the architecture-map plugin: repo surface, feature flows, plan review, and PR before/after as interactive HTML.",
   "type": "module",
@@ -12,6 +12,7 @@
     "typecheck": "bunx tsc -p tsconfig.json --noEmit",
     "sync": "bun tools/sync-manifests.ts",
     "sync:check": "bun tools/sync-manifests.ts --check",
+    "stamp": "bun tools/stamp-version.ts",
     "check": "bun run sync:check && bun run typecheck && bun run test",
     "fixtures": "bun plugins/architecture-map/skills/architecture-map/runtime/cli.ts fixtures"
   },

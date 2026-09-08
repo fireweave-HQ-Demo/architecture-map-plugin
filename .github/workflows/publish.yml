@@ -1,0 +1,47 @@
+name: publish
+
+# Tag-driven release. Source manifests carry `0.0.0-dev`; pushing a
+# `v<semver>` tag stamps the tag's version into every manifest and cuts
+# a GitHub Release. No version is ever hand-edited in a source file.
+#
+# Cutting a release:
+#     git tag v1.3.0 && git push --tags
+#
+# The publish job below then:
+#   1. stamps `1.3.0` into package.json, plugin.json, SKILL.md
+#   2. regenerates the Cursor manifest (bun run sync)
+#   3. re-runs the full check gate against the stamped tree
+#   4. creates a GitHub Release with auto-generated notes
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Need full history so `gh release create --generate-notes` can
+          # diff against the previous tag.
+          fetch-depth: 0
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.2.x'
+      - name: Install
+        run: bun install --frozen-lockfile
+      - name: Stamp version from tag
+        run: bun tools/stamp-version.ts --from-tag
+      - name: Regenerate derived manifests
+        run: bun run sync
+      - name: Verify stamped tree still passes every check
+        run: bun run check
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "$GITHUB_REF_NAME" --generate-notes --title "$GITHUB_REF_NAME"

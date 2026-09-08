@@ -93,14 +93,31 @@ counterparts are projected from them by
 
 ## Release
 
-1. Edit **only** the Claude Code manifests
-   (`plugins/architecture-map/.claude-plugin/plugin.json` and
-   `.claude-plugin/marketplace.json`), the skill `metadata.version`, root
-   `package.json`, and add a `CHANGELOG.md` entry.
-2. `bun run sync` to update the Cursor manifests.
-3. `bun run check`.
-4. Tag `architecture-map-v<version>` and push. Marketplace consumers pin the
-   tag or the commit.
+Releases are **tag-driven**. Every manifest in source carries the
+sentinel `0.0.0-dev`; the version comes from the tag at publish time. No
+version is ever hand-edited in a source file.
+
+1. Rename the `## Unreleased` heading in
+   [`plugins/architecture-map/CHANGELOG.md`](plugins/architecture-map/CHANGELOG.md)
+   to `## <next-version>` and add the release notes underneath it.
+2. Commit and push to `main`.
+3. Cut the release:
+
+   ```
+   git tag v<next-version>          # e.g. git tag v1.3.0
+   git push --tags
+   ```
+
+[`.github/workflows/publish.yml`](.github/workflows/publish.yml) fires on
+the tag push and does the rest — stamps the version into every manifest
+via `bun tools/stamp-version.ts --from-tag`, regenerates the Cursor
+manifests with `bun run sync`, re-runs `bun run check` against the
+stamped tree, and creates a GitHub Release with auto-generated notes.
+Marketplace consumers pin the tag or the commit.
+
+To smoke-test the stamping locally before tagging, run
+`bun run stamp --version <next-version> --check` — exits `1` on drift, `0`
+if every manifest would land at the expected value.
 
 ## License
 

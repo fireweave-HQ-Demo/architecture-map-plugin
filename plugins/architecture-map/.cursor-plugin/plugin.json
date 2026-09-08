@@ -1,7 +1,7 @@
 {
   "name": "architecture-map",
   "displayName": "Architecture Map",
-  "version": "1.2.0",
+  "version": "0.0.0-dev",
   "description": "Accurate, interactive architecture maps of any repository: the whole surface (init), one traced flow, an unimplemented plan graded against disk, or a pull request as before/after of the same path. JSON contract, locked HTML shell, offline Bun runtime. Never guesses — asks.",
   "author": {
     "name": "Architecture Map contributors"

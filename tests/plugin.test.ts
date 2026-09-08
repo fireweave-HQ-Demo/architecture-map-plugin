@@ -47,12 +47,17 @@ const cursor = readJson(join(PLUGIN_DIR, '.cursor-plugin/plugin.json'));
 const commandsDir = join(PLUGIN_DIR, 'commands');
 const commands = readdirSync(commandsDir).filter((f) => f.endsWith('.md')).sort();
 
+/** Sentinel version. Kept in sync with tools/stamp-version.ts:SENTINEL. */
+const SENTINEL_VERSION = '0.0.0-dev';
+
 describe('plugin manifests', () => {
   test('both hosts get the same name, version, description and license', () => {
     for (const m of [claude, cursor]) {
       expect(m.name).toBe('architecture-map');
       expect(typeof m.version).toBe('string');
-      expect(m.version).toMatch(/^\d+\.\d+\.\d+$/);
+      // Source carries the sentinel; a stamped tree carries a real semver.
+      // Either shape must pass so `bun run check` is green in both places.
+      expect(m.version).toMatch(/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/);
       expect(String(m.description).length).toBeGreaterThan(60);
       expect(m.license).toBe('MIT');
       expect((m.author as { name: string }).name).toBeTruthy();
@@ -86,9 +91,17 @@ describe('plugin manifests', () => {
     expect(claudeMarket.$schema).toContain('marketplace.schema.json');
   });
 
-  test('CHANGELOG has an entry for the current version', () => {
+  test('CHANGELOG has an entry for the current version or an Unreleased section', () => {
+    // In source, `claude.version` is the sentinel and CHANGELOG carries an
+    // `## Unreleased` heading for in-flight work. In a stamped tree (CI on
+    // a tag push), CHANGELOG must carry `## <version>` — the developer
+    // renamed `Unreleased` before tagging.
     const changelog = readFileSync(join(PLUGIN_DIR, 'CHANGELOG.md'), 'utf8');
-    expect(changelog).toContain(`## ${claude.version}`);
+    if (claude.version === SENTINEL_VERSION) {
+      expect(changelog).toMatch(/^## Unreleased\b/m);
+    } else {
+      expect(changelog).toContain(`## ${claude.version}`);
+    }
   });
 
   test('root package, skill metadata, and plugin manifests share one version', () => {
@@ -99,6 +112,21 @@ describe('plugin manifests', () => {
     expect(skillVersion).toBe(String(claude.version));
     const engines = root.engines as { bun?: string } | undefined;
     expect(engines?.bun).toMatch(/^>=/);
+  });
+
+  test('source manifests carry the sentinel version (real versions are stamped from the tag)', () => {
+    // Reads the files off disk fresh — the module-level `claude` capture
+    // above still reflects source too, but we assert this loudly to keep
+    // the invariant visible to anyone editing the manifests by hand.
+    const paths = [
+      join(REPO_ROOT, 'package.json'),
+      join(REPO_ROOT, 'plugins/architecture-map/.claude-plugin/plugin.json'),
+    ];
+    for (const p of paths) {
+      expect(String(readJson(p).version), p).toBe(SENTINEL_VERSION);
+    }
+    const skillMd = readFileSync(join(SKILL_DIR, 'SKILL.md'), 'utf8');
+    expect(/^  version:\s*(.+)$/m.exec(skillMd)?.[1]?.trim()).toBe(SENTINEL_VERSION);
   });
 
   test('CI workflow runs bun check on push and pull_request', () => {
@@ -118,6 +146,22 @@ describe('plugin manifests', () => {
     expect(scripts.sync).toBe('bun tools/sync-manifests.ts');
     expect(scripts['sync:check']).toBe('bun tools/sync-manifests.ts --check');
     expect(scripts.check).toContain('sync:check');
+  });
+
+  test('the stamp-version tool exists, is wired up, and the publish workflow uses it', () => {
+    // The version stamping story is a three-part contract: the tool, the
+    // package script, and the workflow that calls it on tag push. If any
+    // one drops, releases silently ship with `0.0.0-dev` in the manifests.
+    expect(existsSync(join(REPO_ROOT, 'tools/stamp-version.ts'))).toBe(true);
+    const pkg = readJson(join(REPO_ROOT, 'package.json'));
+    const scripts = pkg.scripts as Record<string, string>;
+    expect(scripts.stamp).toBe('bun tools/stamp-version.ts');
+    const publish = readFileSync(join(REPO_ROOT, '.github/workflows/publish.yml'), 'utf8');
+    expect(publish).toMatch(/tags:\s*\[?'?v\*/);
+    expect(publish).toContain('bun tools/stamp-version.ts --from-tag');
+    expect(publish).toContain('bun run sync');
+    expect(publish).toContain('bun run check');
+    expect(publish).toContain('gh release create');
   });
 });
 
